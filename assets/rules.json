@@ -1,0 +1,1535 @@
+{
+  "version": "3.0.0-universal",
+  "updatedAt": "2025-01-15",
+  "sources": [
+    "Kaggle SMS Spam Collection Dataset (UCI)",
+    "Indian I4C Cybercrime Reports 2023-24",
+    "RBI/NPCI Fraud Advisories",
+    "CISA/FBI IC3 Global Scam Reports",
+    "APWG Phishing Trends Report"
+  ],
+  "rules": [
+    {
+      "id": "r_digital_arrest_01",
+      "family": "digital_arrest",
+      "type": "regex",
+      "pattern": "digital\\s*arrest|CBI.{0,20}officer|customs.{0,30}parcel|arrest\\s+warrant|court\\s+summon|police\\s*complaint\\s*filed",
+      "flags": "i",
+      "weight": 60,
+      "localizedHint": {
+        "en": "Digital arrest / fake police script detected",
+        "hi": "'डिजिटल अरेस्ट' या नकली पुलिस स्क्रिप्ट के संकेत",
+        "mr": "'डिजिटल अरेस्ट' किंवा बनावट पोलिस स्क्रिप्टचे संकेत"
+      },
+      "description": "Digital-arrest impersonation script markers"
+    },
+    {
+      "id": "r_digital_arrest_02",
+      "family": "digital_arrest",
+      "type": "regex",
+      "pattern": "डिजिटल\\s*अरेस्ट|गिरफ़्तारी\\s*वारंट|सीबीआई\\s*अधिकारी|कस्टम.{0,30}पार्सल|अदालत\\s*का\\s*नोटिस",
+      "flags": "i",
+      "weight": 60,
+      "localizedHint": {
+        "en": "Hindi digital-arrest phrases detected",
+        "hi": "हिंदी में 'डिजिटल अरेस्ट' के शब्द मिले",
+        "mr": "हिंदी 'डिजिटल अरेस्ट' शब्द आढळले"
+      },
+      "description": "Devanagari digital-arrest script variants"
+    },
+    {
+      "id": "r_digital_arrest_03",
+      "family": "digital_arrest",
+      "type": "keyword_proximity",
+      "pattern": "case",
+      "secondaryPattern": "money\\s*laundering|drug|narcotics|terror|hawala",
+      "proximityChars": 80,
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "'Case' near 'money laundering' / drug / terror talking points",
+        "hi": "'केस' पास 'मनी लॉन्ड्रिंग' / ड्रग्स के शब्द",
+        "mr": "'केस' शेजारी 'मनी लाँडरिंग' / ड्रग्स शब्द"
+      },
+      "description": "Fake-police interrogation topic markers"
+    },
+    {
+      "id": "r_digital_arrest_04",
+      "family": "digital_arrest",
+      "type": "regex",
+      "pattern": "(video\\s*call|skype\\s*call|whatsapp\\s*video).{0,40}(police|officer|investigation|interrogation)",
+      "flags": "i",
+      "weight": 55,
+      "localizedHint": {
+        "en": "Video call from 'police officer' — classic digital arrest trap",
+        "hi": "पुलिस अधिकारी से 'वीडियो कॉल' — डिजिटल अरेस्ट जाल",
+        "mr": "पोलिस अधिकाऱ्याकडून 'व्हिडिओ कॉल' — डिजिटल अरेस्ट सापळा"
+      },
+      "description": "Video call police impersonation"
+    },
+    {
+      "id": "r_digital_arrest_05",
+      "family": "digital_arrest",
+      "type": "regex",
+      "pattern": "supreme\\s*court|high\\s*court|special\\s*task\\s*force|enforcement\\s*directorate|cyber\\s*cell",
+      "flags": "i",
+      "weight": 30,
+      "localizedHint": {
+        "en": "Fake authority impersonation (Supreme Court/ED/STF)",
+        "hi": "सुप्रीम कोर्ट/ED/STF के नाम पर धोखा",
+        "mr": "सुप्रीम कोर्ट/ED/STF च्या नावाने फसवणूक"
+      },
+      "description": "Fake court/authority reference"
+    },
+    {
+      "id": "r_fake_kyc_01",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "kyc\\s*(expired|suspend|blocked|update|verify|pending|failed|incomplete)",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "Fake KYC expiry/block wording",
+        "hi": "'KYC समाप्त' / ब्लॉक की नकली भाषा",
+        "mr": "'KYC संपली' / ब्लॉकची बनावट भाषा"
+      },
+      "description": "KYC panic wording"
+    },
+    {
+      "id": "r_fake_kyc_02",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "kyc\\s*(अवधि\\s*समाप्त|समाप्त|अपडेट|बंद|पूरी\\s*करें|अधूरी)|केवायसी",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "Hindi KYC scam wording",
+        "hi": "हिंदी में KYC/केवायसी घोटाला शब्द",
+        "mr": "हिंदी KYC घोटाळा शब्द"
+      },
+      "description": "Devanagari KYC scam wording"
+    },
+    {
+      "id": "r_fake_kyc_03",
+      "family": "fake_kyc",
+      "type": "keyword_proximity",
+      "pattern": "kyc|केवायसी|verification",
+      "secondaryPattern": "account\\s*(block|closed|freeze|suspend|deactivat)|खाता\\s*बंद",
+      "proximityChars": 100,
+      "flags": "i",
+      "weight": 35,
+      "localizedHint": {
+        "en": "KYC + account-block threat combo",
+        "hi": "KYC + खाता बंद की धमकी",
+        "mr": "KYC + खाते बंदची धमकी"
+      },
+      "description": "KYC combined with account-block threat"
+    },
+    {
+      "id": "r_fake_kyc_04",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "(pan|aadhaar|aadhar).{0,30}(link|linking|update|verify|expired|failed)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Fake PAN/Aadhaar linking scam",
+        "hi": "नकली PAN/आधार लिंकिंग घोटाला",
+        "mr": "बनावट PAN/आधार लिंकिंग फसवणूक"
+      },
+      "description": "PAN/Aadhaar linking scam"
+    },
+    {
+      "id": "r_fake_kyc_05",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "(sbi|hdfc|icici|axis|kotak|pnb|yes\\s*bank|bob|paytm|phonepe|gpay).{0,40}(kyc|verification|update|blocked|frozen)",
+      "flags": "i",
+      "weight": 50,
+      "localizedHint": {
+        "en": "Bank/wallet impersonation KYC scam",
+        "hi": "बैंक/वॉलेट के नाम पर KYC घोटाला",
+        "mr": "बँक/वॉलेटच्या नावाने KYC फसवणूक"
+      },
+      "description": "Bank impersonation KYC scam"
+    },
+    {
+      "id": "r_upi_collect_01",
+      "family": "upi_collect_trap",
+      "type": "keyword_proximity",
+      "pattern": "pin",
+      "secondaryPattern": "receive|get\\s*money|पैसे\\s*पाने|मिळवण्यासाठी|प्राप्त|credit|to\\s*get",
+      "proximityChars": 50,
+      "flags": "i",
+      "weight": 55,
+      "localizedHint": {
+        "en": "'PIN' asked to receive money — classic UPI trap",
+        "hi": "पैसे पाने के लिए PIN माँगा जा रहा है — घोटाला",
+        "mr": "पैसे मिळवण्यासाठी PIN मागत आहेत — फसवणूक"
+      },
+      "description": "UPI collect-request trap"
+    },
+    {
+      "id": "r_upi_collect_02",
+      "family": "upi_collect_trap",
+      "type": "regex",
+      "pattern": "collect\\s*request|money\\s*request|approve\\s*payment|approve\\s*request|pull\\s*payment",
+      "flags": "i",
+      "weight": 35,
+      "localizedHint": {
+        "en": "Unsolicited UPI collect/approval request",
+        "hi": "बिना पूछे UPI कलेक्ट रिक्वेस्ट",
+        "mr": "न मागता UPI कलेक्ट विनंती"
+      },
+      "description": "UPI collect keywords"
+    },
+    {
+      "id": "r_upi_collect_03",
+      "family": "upi_collect_trap",
+      "type": "upi_rule",
+      "pattern": "collect_intent_marked_as_receive",
+      "weight": 55,
+      "localizedHint": {
+        "en": "QR code sends money instead of receiving",
+        "hi": "QR कोड पैसे पाने की जगह भेजता है",
+        "mr": "QR कोड पैसे मिळण्याऐवजी पाठवतो"
+      },
+      "description": "Structural mismatch on parsed UPI intent"
+    },
+    {
+      "id": "r_upi_pin_receive",
+      "family": "upi_collect_trap",
+      "type": "regex",
+      "pattern": "enter\\s*(upi\\s*)?pin.{0,40}(receive|get|credit|paise|money)",
+      "flags": "i",
+      "weight": 55,
+      "localizedHint": {
+        "en": "'Enter UPI PIN to receive' — impossible; SCAM",
+        "hi": "'UPI PIN डालो और पैसे पाओ' — असंभव, घोटाला",
+        "mr": "'UPI PIN टाका आणि पैसे मिळवा' — अशक्य, फसवणूक"
+      },
+      "description": "PIN-to-receive scam"
+    },
+    {
+      "id": "r_upi_refund_scam",
+      "family": "upi_collect_trap",
+      "type": "regex",
+      "pattern": "(refund|cashback|reward)\\s*of\\s*(rs\\.?|₹|inr)?\\s*[0-9,]+.{0,40}(scan|upi|pin|approve)",
+      "flags": "i",
+      "weight": 50,
+      "localizedHint": {
+        "en": "Fake refund → asks you to scan/PIN — SCAM",
+        "hi": "'रिफंड' के नाम पर स्कैन/PIN माँग — घोटाला",
+        "mr": "'रिफंड' च्या नावाखाली स्कॅन/PIN मागणी — फसवणूक"
+      },
+      "description": "Fake refund UPI scam"
+    },
+    {
+      "id": "r_fake_challan_01",
+      "family": "fake_challan",
+      "type": "regex",
+      "pattern": "e-?challan|traffic\\s*fine|penalty\\s*(pending|due)|vehicle\\s*fine",
+      "flags": "i",
+      "weight": 30,
+      "localizedHint": {
+        "en": "E-challan wording",
+        "hi": "ई-चालान की भाषा",
+        "mr": "ई-चलानची भाषा"
+      },
+      "description": "Bare challan reference"
+    },
+    {
+      "id": "r_fake_challan_02",
+      "family": "fake_challan",
+      "type": "url_domain_rule",
+      "pattern": "challan_link_not_in_allowlist",
+      "allowlist": ["echallan.gov.in", "parivahan.gov.in"],
+      "weight": 45,
+      "localizedHint": {
+        "en": "Challan link is NOT the official govt domain",
+        "hi": "चालान लिंक सरकारी वेबसाइट का नहीं है",
+        "mr": "चलान लिंक सरकारी वेबसाइटचा नाही"
+      },
+      "description": "Non-govt challan link"
+    },
+    {
+      "id": "r_fake_challan_03",
+      "family": "fake_challan",
+      "type": "regex",
+      "pattern": "चालान|चलान|यातायात\\s*जुर्माना|वाहन\\s*चालान",
+      "flags": "i",
+      "weight": 25,
+      "localizedHint": {
+        "en": "Hindi/Marathi challan wording",
+        "hi": "हिंदी में 'चालान' शब्द",
+        "mr": "मराठीत 'चलान' शब्द"
+      },
+      "description": "Devanagari challan wording"
+    },
+    {
+      "id": "r_fake_electricity_bill",
+      "family": "fake_challan",
+      "type": "regex",
+      "pattern": "electricity\\s*(bill|connection).{0,60}(disconnect|cut|off|pending|overdue|night)|बिजली.{0,40}(कट|बंद|काट)",
+      "flags": "i",
+      "weight": 50,
+      "localizedHint": {
+        "en": "Electricity disconnection threat scam",
+        "hi": "'बिजली कट जाएगी' का घोटाला",
+        "mr": "'वीज कापली जाईल' चा फसवणूक संदेश"
+      },
+      "description": "Electricity bill disconnection scam"
+    },
+    {
+      "id": "r_fake_gas_connection",
+      "family": "fake_challan",
+      "type": "regex",
+      "pattern": "gas\\s*(connection|cylinder|subsidy).{0,50}(pending|update|verify|kyc|blocked)",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "Fake LPG gas connection KYC scam",
+        "hi": "गैस कनेक्शन KYC का नकली संदेश",
+        "mr": "गॅस कनेक्शन KYC चा बनावट संदेश"
+      },
+      "description": "LPG gas connection fake KYC"
+    },
+    {
+      "id": "r_lottery_01",
+      "family": "lottery",
+      "type": "keyword_proximity",
+      "pattern": "lottery|winner|kbc|jeeta|पारितोषिक|इनाम|जीत(?:े|ा)|prize\\s*money",
+      "secondaryPattern": "fee|registration|claim|charge|शुल्क|फ़ीस|processing",
+      "proximityChars": 80,
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "Lottery win + advance fee — always a scam",
+        "hi": "लॉटरी जीत + शुल्क माँग — हमेशा घोटाला",
+        "mr": "लॉटरी जिंकली + शुल्क मागणी — नेहमीच फसवणूक"
+      },
+      "description": "Advance-fee lottery"
+    },
+    {
+      "id": "r_lottery_02",
+      "family": "lottery",
+      "type": "regex",
+      "pattern": "kbc|kaun\\s*banega\\s*crorepati|amitabh\\s*bachchan.{0,30}(lottery|prize)",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "KBC impersonation",
+        "hi": "'KBC' का नकली दावा",
+        "mr": "'KBC' चा बनावट दावा"
+      },
+      "description": "KBC lottery scam"
+    },
+    {
+      "id": "r_lottery_03",
+      "family": "lottery",
+      "type": "regex",
+      "pattern": "congratulations.{0,60}(won|winner|selected|lucky|chosen)",
+      "flags": "i",
+      "weight": 25,
+      "localizedHint": {
+        "en": "'Congratulations you won' template",
+        "hi": "'बधाई हो, आपने जीता' का टेम्पलेट",
+        "mr": "'अभिनंदन, तुम्ही जिंकलात' टेम्पलेट"
+      },
+      "description": "Winner template"
+    },
+    {
+      "id": "r_lottery_04",
+      "family": "lottery",
+      "type": "regex",
+      "pattern": "you\\s*(have\\s*)?won.{0,40}(iphone|car|bike|₹|rs\\.?|\\$|prize|gift\\s*card)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "'You have won iPhone/Car/Prize' template",
+        "hi": "'आपने iPhone/Car जीता' — घोटाला",
+        "mr": "'तुम्ही iPhone/Car जिंकलात' — फसवणूक"
+      },
+      "description": "Prize won template"
+    },
+    {
+      "id": "r_fake_payment_01",
+      "family": "fake_payment_screenshot",
+      "type": "structure_rule",
+      "pattern": "utr_digits_not_12",
+      "weight": 45,
+      "localizedHint": {
+        "en": "UTR reference number has wrong digit count",
+        "hi": "UTR नंबर में सही अंक नहीं",
+        "mr": "UTR क्रमांकाची अंकसंख्या चुकीची"
+      },
+      "description": "OCR'd UTR not 12 digits"
+    },
+    {
+      "id": "r_fake_payment_02",
+      "family": "fake_payment_screenshot",
+      "type": "regex",
+      "pattern": "paid\\s*to|paid\\s*successfully|payment\\s*successful|transaction\\s*successful",
+      "flags": "i",
+      "weight": 20,
+      "localizedHint": {
+        "en": "'Payment successful' phrasing on shared image",
+        "hi": "'पेमेंट सफल' शब्द — फोटो से भेजा गया",
+        "mr": "'पेमेंट यशस्वी' शब्द — फोटोतून पाठवलेला"
+      },
+      "description": "Payment-success screenshot marker"
+    },
+    {
+      "id": "r_fake_payment_03",
+      "family": "fake_payment_screenshot",
+      "type": "keyword_proximity",
+      "pattern": "screenshot|image|photo",
+      "secondaryPattern": "payment|paid|utr|transaction",
+      "proximityChars": 80,
+      "flags": "i",
+      "weight": 20,
+      "localizedHint": {
+        "en": "Payment claim + image proof — verify in bank app",
+        "hi": "फोटो से पेमेंट का दावा — बैंक ऐप में जाँचें",
+        "mr": "फोटोमधून पेमेंटचा दावा — बँक अ‍ॅपमध्ये तपासा"
+      },
+      "description": "Payment-proof-by-image request"
+    },
+    {
+      "id": "r_phishing_link_01",
+      "family": "phishing_link",
+      "type": "url_domain_rule",
+      "pattern": "any_link_with_login_or_pay_keyword",
+      "weight": 35,
+      "localizedHint": {
+        "en": "Suspicious link with login/pay/verify wording",
+        "hi": "'लॉगिन/पे/वेरिफाई' वाला संदिग्ध लिंक",
+        "mr": "'लॉगिन/पे/व्हेरिफाय' असलेला संशयास्पद लिंक"
+      },
+      "description": "Non-HTTPS or bad-TLD link near sensitive keywords"
+    },
+    {
+      "id": "r_phishing_link_02",
+      "family": "phishing_link",
+      "type": "url_domain_rule",
+      "pattern": "suspicious_tld_present",
+      "weight": 30,
+      "localizedHint": {
+        "en": "Link uses a commonly-abused TLD (.xyz/.top/…)",
+        "hi": "लिंक का पता संदिग्ध (.xyz/.top/...)",
+        "mr": "लिंकचा पत्ता संशयास्पद (.xyz/.top/...)"
+      },
+      "description": "Suspicious TLD flag"
+    },
+    {
+      "id": "r_phishing_link_03",
+      "family": "phishing_link",
+      "type": "url_domain_rule",
+      "pattern": "http_not_https_with_sensitive_word",
+      "weight": 25,
+      "localizedHint": {
+        "en": "Non-HTTPS link with sensitive wording",
+        "hi": "गैर-HTTPS लिंक + संवेदनशील शब्द",
+        "mr": "HTTPS नसलेला लिंक + संवेदनशील शब्द"
+      },
+      "description": "Insecure link with sensitive context"
+    },
+    {
+      "id": "r_phishing_shortener",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "(bit\\.ly|tinyurl\\.com|goo\\.gl|t\\.co|is\\.gd|ow\\.ly|rebrand\\.ly|cutt\\.ly|shorturl\\.at|rb\\.gy|tiny\\.cc)/[a-z0-9]+",
+      "flags": "i",
+      "weight": 25,
+      "localizedHint": {
+        "en": "URL shortener detected — hides real destination",
+        "hi": "छोटा URL — असली पता छिपा हुआ",
+        "mr": "लहान URL — खरा पत्ता लपवलेला"
+      },
+      "description": "URL shortener obscuring destination"
+    },
+    {
+      "id": "r_phishing_ip_url",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "https?://\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Raw IP address in URL — almost always malicious",
+        "hi": "URL में IP address — लगभग हमेशा घोटाला",
+        "mr": "URL मध्ये IP address — जवळजवळ नेहमी फसवणूक"
+      },
+      "description": "IP-based URL (no domain name)"
+    },
+    {
+      "id": "r_phishing_lookalike_domain",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "(paypa1|amaz0n|g00gle|facebo0k|micros0ft|app1e|netfl1x|wh4tsapp|hdf-c|sb1-|1cici|axis-bank-|paytm-|phonepe-)",
+      "flags": "i",
+      "weight": 55,
+      "localizedHint": {
+        "en": "Lookalike domain (e.g., paypa1, amaz0n) — SCAM",
+        "hi": "नकली दिखने वाला डोमेन (paypa1, amaz0n) — घोटाला",
+        "mr": "बनावट डोमेन (paypa1, amaz0n) — फसवणूक"
+      },
+      "description": "Typosquatting / lookalike domain"
+    },
+    {
+      "id": "r_qr_impersonation_01",
+      "family": "qr_impersonation",
+      "type": "upi_rule",
+      "pattern": "claimed_name_mismatch",
+      "weight": 55,
+      "localizedHint": {
+        "en": "Sticker/message name ≠ actual UPI payee",
+        "hi": "स्टिकर/मैसेज का नाम असली UPI नाम से अलग",
+        "mr": "स्टिकर/मेसेजचे नाव खऱ्या UPI नावाशी जुळत नाही"
+      },
+      "description": "Payee-VPA vs claimed name mismatch"
+    },
+    {
+      "id": "r_qr_impersonation_02",
+      "family": "qr_impersonation",
+      "type": "regex",
+      "pattern": "scan\\s*to\\s*(receive|collect|get)|scan\\s*and\\s*(receive|collect)|scan\\s*for\\s*(refund|cashback)",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "'Scan to receive' — UPI receive doesn't need scan+PIN",
+        "hi": "'पैसे पाने के लिए स्कैन' — पाने में PIN नहीं लगता",
+        "mr": "'पैसे मिळवण्यासाठी स्कॅन' — मिळवण्यासाठी PIN लागत नाही"
+      },
+      "description": "Scan-to-receive framing"
+    },
+    {
+      "id": "r_investment_01",
+      "family": "investment_group",
+      "type": "keyword_proximity",
+      "pattern": "telegram|whatsapp\\s*group|vip\\s*group|premium\\s*group",
+      "secondaryPattern": "guaranteed|profit|100%|multiply|double|triple|assured\\s*returns",
+      "proximityChars": 100,
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "'Guaranteed profit' investment group — SCAM",
+        "hi": "'गारंटीड प्रॉफ़िट' निवेश ग्रुप — घोटाला",
+        "mr": "'गॅरंटीड प्रॉफिट' गुंतवणूक गट — फसवणूक"
+      },
+      "description": "Pig-butchering / investment group hook"
+    },
+    {
+      "id": "r_investment_02",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "share\\s*tips|stock\\s*tips|jackpot\\s*call|sure\\s*shot|intraday\\s*calls|f\\&o\\s*tips",
+      "flags": "i",
+      "weight": 30,
+      "localizedHint": {
+        "en": "Unregistered stock/share tip service",
+        "hi": "गैर-पंजीकृत शेयर टिप सेवा",
+        "mr": "नोंदणी नसलेली शेअर टिप सेवा"
+      },
+      "description": "Stock tip pitch"
+    },
+    {
+      "id": "r_investment_03",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "part[\\s-]*time\\s*job.{0,50}(daily|per\\s*day).{0,15}(₹|rs\\.?|inr|\\$|usd)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "'Part-time job — earn X per day' lure",
+        "hi": "'पार्ट-टाइम जॉब, हर दिन X' का लालच",
+        "mr": "'पार्ट-टाइम जॉब, रोज X' चा आमिष"
+      },
+      "description": "Task-scam job pitch"
+    },
+    {
+      "id": "r_investment_04",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "(bitcoin|crypto|usdt|ethereum|binance|forex|nft).{0,50}(guaranteed|profit|double|multiply|invest|returns|trading\\s*bot)",
+      "flags": "i",
+      "weight": 50,
+      "localizedHint": {
+        "en": "Crypto/Bitcoin guaranteed profit — SCAM",
+        "hi": "क्रिप्टो/बिटकॉइन में गारंटीड मुनाफा — घोटाला",
+        "mr": "क्रिप्टो/बिटकॉइनमध्ये गॅरंटीड नफा — फसवणूक"
+      },
+      "description": "Crypto investment scam"
+    },
+    {
+      "id": "r_investment_05",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "(youtube|instagram|tiktok|facebook)\\s*(like|subscribe|view|follow).{0,40}(₹|rs\\.?|\\$|earn|paid|reward)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "'Like YouTube videos and earn' task scam",
+        "hi": "'YouTube like करके पैसे कमाओ' — task घोटाला",
+        "mr": "'YouTube like करून पैसे कमवा' — task फसवणूक"
+      },
+      "description": "Social media task scam"
+    },
+    {
+      "id": "r_investment_06",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "(work\\s*from\\s*home|wfh|online\\s*job|home\\s*based).{0,40}(₹|rs\\.?|\\$|per\\s*hour|per\\s*task|daily\\s*earn)",
+      "flags": "i",
+      "weight": 30,
+      "localizedHint": {
+        "en": "Suspicious work-from-home offer",
+        "hi": "संदिग्ध 'work from home' का ऑफर",
+        "mr": "संशयास्पद 'work from home' ऑफर"
+      },
+      "description": "Suspicious WFH offer"
+    },
+    {
+      "id": "r_sim_swap_01",
+      "family": "sim_swap",
+      "type": "regex",
+      "pattern": "sim\\s*(swap|upgrade|replace|4g\\s*to\\s*5g|expired|deactivat)",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "SIM swap/upgrade request",
+        "hi": "SIM स्वैप/अपग्रेड की माँग",
+        "mr": "SIM स्वॅप/अपग्रेडची मागणी"
+      },
+      "description": "SIM swap wording"
+    },
+    {
+      "id": "r_sim_swap_02",
+      "family": "sim_swap",
+      "type": "keyword_proximity",
+      "pattern": "sim",
+      "secondaryPattern": "otp|verification\\s*code|link\\s*aadhaar|aadhaar\\s*link",
+      "proximityChars": 60,
+      "flags": "i",
+      "weight": 30,
+      "localizedHint": {
+        "en": "SIM change + OTP request combination",
+        "hi": "SIM बदलाव + OTP की माँग",
+        "mr": "SIM बदल + OTP मागणी"
+      },
+      "description": "SIM + OTP proximity"
+    },
+    {
+      "id": "r_sim_swap_03",
+      "family": "sim_swap",
+      "type": "regex",
+      "pattern": "port\\s*out|mnp\\s*request|network\\s*port|jio\\s*to\\s*airtel|airtel\\s*to\\s*jio",
+      "flags": "i",
+      "weight": 25,
+      "localizedHint": {
+        "en": "Unsolicited number-porting request",
+        "hi": "बिना पूछे नंबर पोर्ट की माँग",
+        "mr": "न विचारता नंबर पोर्टची मागणी"
+      },
+      "description": "Number porting scam"
+    },
+    {
+      "id": "r_urgency_01",
+      "family": "digital_arrest",
+      "type": "keyword_proximity",
+      "pattern": "block|ब्लॉक|बंद|suspend|freeze|deactivat",
+      "secondaryPattern": "24\\s*hours|2\\s*hours|today\\s*only|आजच|तुरंत|आत्ता|within.{0,10}(hour|minute|day)",
+      "proximityChars": 60,
+      "flags": "i",
+      "weight": 25,
+      "localizedHint": {
+        "en": "Extreme urgency + block/close threat",
+        "hi": "अत्यधिक जल्दबाज़ी + खाता बंद की धमकी",
+        "mr": "अतीव घाई + खाते बंदची धमकी"
+      },
+      "description": "Urgency + threat"
+    },
+    {
+      "id": "r_urgency_02",
+      "family": "digital_arrest",
+      "type": "regex",
+      "pattern": "immediately|right\\s*now|तुरंत|अभी|आत्ताच|without\\s*delay|urgent|asap",
+      "flags": "i",
+      "weight": 10,
+      "localizedHint": {
+        "en": "High-pressure language",
+        "hi": "अत्यधिक दबाव वाली भाषा",
+        "mr": "अत्यंत दबावाची भाषा"
+      },
+      "description": "Pressure keywords"
+    },
+    {
+      "id": "r_global_bank_fraud_01",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "fraud\\s*dept|wire\\s*transfer|unauthorized\\s*(transaction|access|charge|purchase)|attempted\\s*(transfer|login)|secure\\s*fraud\\s*line|suspicious\\s*activity",
+      "flags": "i",
+      "weight": 60,
+      "localizedHint": {
+        "en": "Fake bank/fraud department security alert",
+        "hi": "नकली बैंक/फ्रॉड विभाग का सुरक्षा अलर्ट",
+        "mr": "बनावट बँक/फ्रॉड विभागाचा सुरक्षा इशारा"
+      },
+      "description": "Global bank fraud alert impersonation"
+    },
+    {
+      "id": "r_global_bank_fraud_02",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "reply\\s*stop|call\\s*our\\s*(secure|fraud)\\s*line|call.{0,30}(1-8\\d{2}|1-800|\\+1)|case\\s*#[0-9a-z-]+|reference\\s*#[0-9a-z-]+",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Fake urgency framing with case#/toll-free callback",
+        "hi": "केस नंबर के साथ नकली कॉल-बैक नंबर",
+        "mr": "केस नंबरसह बनावट कॉल-बैक नंबर"
+      },
+      "description": "Toll-free callback + case number scam"
+    },
+    {
+      "id": "r_global_currency_panic",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "(\\$|€|£|usd|eur|gbp|aud|cad)\\s*[0-9,]+(\\.[0-9]{2})?",
+      "flags": "i",
+      "weight": 15,
+      "localizedHint": {
+        "en": "Foreign currency transfer amount mentioned",
+        "hi": "विदेशी मुद्रा की राशि का उल्लेख",
+        "mr": "परदेशी चलनातील रक्कमेचा उल्लेख"
+      },
+      "description": "Foreign currency amount marker"
+    },
+    {
+      "id": "r_account_suspension_global",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "account\\s*(suspended|disabled|restricted|locked|closed|frozen|limited)|action\\s*required.{0,50}(paypal|amazon|apple|netflix|bank|wells\\s*fargo|chase|citi|hsbc|barclays)",
+      "flags": "i",
+      "weight": 55,
+      "localizedHint": {
+        "en": "Global account suspension panic scam",
+        "hi": "खाता बंद होने का नकली अलर्ट (PayPal/Amazon)",
+        "mr": "खाते बंद होण्याचा बनावट इशारा"
+      },
+      "description": "Global account suspension phishing"
+    },
+    {
+      "id": "r_package_delivery_global",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "(package|parcel|shipment|delivery|courier).{0,40}(failed|pending|address|track|stopped|held|customs|undeliverable)",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "Package delivery scam (FedEx/DHL/USPS/BlueDart)",
+        "hi": "पार्सल/कूरियर डिलीवरी का नकली संदेश",
+        "mr": "पार्सल/कूरियर डिलिव्हरीचा बनावट संदेश"
+      },
+      "description": "Package delivery phishing"
+    },
+    {
+      "id": "r_package_delivery_courier",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "(dhl|fedex|usps|ups|bluedart|delhivery|ecom\\s*express|india\\s*post|dtdc)\\s*(express|delivery|shipment|package)",
+      "flags": "i",
+      "weight": 30,
+      "localizedHint": {
+        "en": "Courier company impersonation",
+        "hi": "कूरियर कंपनी के नाम पर धोखा",
+        "mr": "कुरिअर कंपनीच्या नावाने फसवणूक"
+      },
+      "description": "Courier company impersonation"
+    },
+    {
+      "id": "r_tech_support_scam",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "(microsoft|apple|google|windows|mac).{0,40}(support|technician|virus|malware|hacked|infected|error\\s*code)",
+      "flags": "i",
+      "weight": 50,
+      "localizedHint": {
+        "en": "Fake tech support scam (Microsoft/Apple/Google)",
+        "hi": "नकली टेक सपोर्ट घोटाला (Microsoft/Apple)",
+        "mr": "बनावट टेक सपोर्ट फसवणूक (Microsoft/Apple)"
+      },
+      "description": "Tech support impersonation scam"
+    },
+    {
+      "id": "r_tech_support_call",
+      "family": "phishing_link",
+      "type": "keyword_proximity",
+      "pattern": "your\\s*(computer|device|pc|laptop|phone)",
+      "secondaryPattern": "hacked|infected|virus|compromised|blocked|banned",
+      "proximityChars": 60,
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "'Your device is hacked/infected' scam",
+        "hi": "'आपका डिवाइस हैक हो गया' का घोटाला",
+        "mr": "'तुमचे डिव्हाइस हॅक झाले' चा फसवणूक"
+      },
+      "description": "Device compromise scam"
+    },
+    {
+      "id": "r_romance_scam_01",
+      "family": "investment_group",
+      "type": "keyword_proximity",
+      "pattern": "love|dating|met\\s*you|romantic|relationship|marry\\s*me|soulmate",
+      "secondaryPattern": "money|₹|\\$|send|transfer|urgent|emergency|hospital|visa|ticket",
+      "proximityChars": 150,
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Romance scam pattern — love + money request",
+        "hi": "प्यार + पैसे की माँग — रोमांस घोटाला",
+        "mr": "प्रेम + पैसे मागणी — रोमान्स फसवणूक"
+      },
+      "description": "Romance / dating scam"
+    },
+    {
+      "id": "r_job_offer_scam_01",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "(job\\s*offer|hiring|vacancy|recruitment).{0,40}(salary|package|₹|rs\\.?|\\$).{0,40}(no\\s*interview|instant|direct\\s*joining|without\\s*experience)",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "Fake job offer with no interview / instant joining",
+        "hi": "बिना इंटरव्यू के 'जॉब ऑफर' — घोटाला",
+        "mr": "मुलाखतीशिवाय 'जॉब ऑफर' — फसवणूक"
+      },
+      "description": "Fake job offer scam"
+    },
+    {
+      "id": "r_job_offer_fee",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "(job|placement|training|registration).{0,40}(fee|deposit|security\\s*deposit).{0,20}(₹|rs\\.?|\\$|pay)",
+      "flags": "i",
+      "weight": 50,
+      "localizedHint": {
+        "en": "Job asks for advance fee — always a scam",
+        "hi": "'जॉब के लिए पहले पैसे दो' — हमेशा घोटाला",
+        "mr": "'नोकरीसाठी आधी पैसे द्या' — नेहमीच फसवणूक"
+      },
+      "description": "Advance-fee job scam"
+    },
+    {
+      "id": "r_loan_scam_01",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "(instant|quick|urgent|personal|business)\\s*loan.{0,40}(no\\s*documents|no\\s*cibil|without\\s*credit|no\\s*collateral|approved)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Suspicious instant loan offer",
+        "hi": "'तुरंत लोन, कोई documents नहीं' — घोटाला",
+        "mr": "'त्वरित लोन, कोणतीही कागदपत्रे नाही' — फसवणूक"
+      },
+      "description": "Instant loan scam"
+    },
+    {
+      "id": "r_loan_processing_fee",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "loan.{0,40}(processing\\s*fee|advance\\s*fee|gst|convenience\\s*fee).{0,20}(₹|rs\\.?|\\$|pay)",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "Loan requires 'processing fee' — always fake",
+        "hi": "'लोन के लिए processing fee' — हमेशा नकली",
+        "mr": "'लोनसाठी processing fee' — नेहमीच बनावट"
+      },
+      "description": "Loan processing fee scam"
+    },
+    {
+      "id": "r_credit_card_scam",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "credit\\s*card.{0,50}(blocked|expired|deactivat|reward\\s*points|redeem|convert\\s*to\\s*emi)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Fake credit card block/reward scam",
+        "hi": "नकली क्रेडिट कार्ड ब्लॉक/रिवॉर्ड घोटाला",
+        "mr": "बनावट क्रेडिट कार्ड ब्लॉक/रिवॉर्ड फसवणूक"
+      },
+      "description": "Credit card block scam"
+    },
+    {
+      "id": "r_reward_points_scam",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "(reward|loyalty|bonus)\\s*points.{0,50}(expire|expiring|redeem|convert|claim).{0,20}(now|today|24\\s*hours)",
+      "flags": "i",
+      "weight": 35,
+      "localizedHint": {
+        "en": "Fake 'reward points expiring' urgency scam",
+        "hi": "'रिवॉर्ड पॉइंट expire हो रहे' — घोटाला",
+        "mr": "'रिवॉर्ड पॉइंट expire होत आहेत' — फसवणूक"
+      },
+      "description": "Reward points expiry scam"
+    },
+    {
+      "id": "r_income_tax_refund",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "income\\s*tax.{0,40}(refund|return|pending|approved).{0,40}(claim|process|verify|link)",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "Fake income tax refund scam",
+        "hi": "नकली इनकम टैक्स रिफंड घोटाला",
+        "mr": "बनावट इन्कम टॅक्स रिफंड फसवणूक"
+      },
+      "description": "IT refund scam"
+    },
+    {
+      "id": "r_income_tax_notice",
+      "family": "digital_arrest",
+      "type": "regex",
+      "pattern": "income\\s*tax.{0,40}(notice|department|raid|penalty|fine|scrutiny)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Fake IT department notice threat",
+        "hi": "नकली IT विभाग नोटिस की धमकी",
+        "mr": "बनावट IT विभाग नोटिसची धमकी"
+      },
+      "description": "IT department threat scam"
+    },
+    {
+      "id": "r_gst_scam",
+      "family": "fake_challan",
+      "type": "regex",
+      "pattern": "gst.{0,40}(pending|due|notice|penalty|refund|registration|verification)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Fake GST scam",
+        "hi": "नकली GST घोटाला",
+        "mr": "बनावट GST फसवणूक"
+      },
+      "description": "GST scam"
+    },
+    {
+      "id": "r_matrimonial_scam",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "(matrimonial|marriage|nri|abroad).{0,60}(gift|customs|clearance|hospital|emergency).{0,20}(money|₹|\\$|transfer)",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "Matrimonial NRI scam (gift stuck at customs)",
+        "hi": "मैट्रिमोनियल NRI घोटाला (customs में gift)",
+        "mr": "मॅट्रिमोनियल NRI फसवणूक (कस्टममध्ये gift)"
+      },
+      "description": "Matrimonial NRI gift scam"
+    },
+    {
+      "id": "r_charity_scam",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "(donate|charity|cancer\\s*patient|orphan|flood|earthquake|covid|vaccine).{0,40}(help|urgent|pm\\s*cares|save|₹|\\$)",
+      "flags": "i",
+      "weight": 30,
+      "localizedHint": {
+        "en": "Suspicious charity/donation request",
+        "hi": "संदिग्ध चैरिटी/दान अपील",
+        "mr": "संशयास्पद चॅरिटी/दानाची विनंती"
+      },
+      "description": "Fake charity scam"
+    },
+    {
+      "id": "r_muleaccount_recruit",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "(rent|use|share).{0,20}(your|my).{0,20}(bank\\s*account|upi|paytm).{0,40}(commission|percentage|%|₹|\\$)",
+      "flags": "i",
+      "weight": 55,
+      "localizedHint": {
+        "en": "Recruitment to become a money mule — criminal offense",
+        "hi": "मनी म्यूल बनने का प्रस्ताव — अपराध",
+        "mr": "मनी म्यूल होण्याचा प्रस्ताव — गुन्हा"
+      },
+      "description": "Mule account recruitment"
+    },
+    {
+      "id": "r_electricity_reconnection",
+      "family": "fake_challan",
+      "type": "regex",
+      "pattern": "(mseb|bses|torrent\\s*power|adani\\s*electricity|tata\\s*power|reliance\\s*energy).{0,40}(bill|pending|disconnect|overdue)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Electricity provider impersonation scam",
+        "hi": "बिजली कंपनी के नाम पर धोखा",
+        "mr": "वीज कंपनीच्या नावाने फसवणूक"
+      },
+      "description": "Electricity provider scam"
+    },
+    {
+      "id": "r_credit_score_scam",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "(cibil|credit\\s*score|credit\\s*report).{0,40}(dropped|lowered|check|free|improve|repair)",
+      "flags": "i",
+      "weight": 30,
+      "localizedHint": {
+        "en": "Fake credit score / CIBIL scam",
+        "hi": "नकली CIBIL / क्रेडिट स्कोर घोटाला",
+        "mr": "बनावट CIBIL / क्रेडिट स्कोर फसवणूक"
+      },
+      "description": "CIBIL/credit score scam"
+    },
+    {
+      "id": "r_insurance_scam",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "(insurance|policy|premium).{0,40}(lapsed|renewal|bonus|maturity|claim).{0,40}(link|click|verify|pay)",
+      "flags": "i",
+      "weight": 35,
+      "localizedHint": {
+        "en": "Fake insurance policy scam",
+        "hi": "नकली बीमा पॉलिसी घोटाला",
+        "mr": "बनावट विमा पॉलिसी फसवणूक"
+      },
+      "description": "Insurance policy scam"
+    },
+    {
+      "id": "r_amazon_impersonation",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "amazon.{0,40}(order|shipment|refund|delivery|prize|winner|survey|reward|₹|\\$)",
+      "flags": "i",
+      "weight": 30,
+      "localizedHint": {
+        "en": "Amazon impersonation scam",
+        "hi": "Amazon के नाम पर धोखा",
+        "mr": "Amazon च्या नावाने फसवणूक"
+      },
+      "description": "Amazon impersonation"
+    },
+    {
+      "id": "r_flipkart_impersonation",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "flipkart.{0,40}(order|shipment|refund|delivery|prize|winner|survey|reward|₹|\\$)",
+      "flags": "i",
+      "weight": 30,
+      "localizedHint": {
+        "en": "Flipkart impersonation scam",
+        "hi": "Flipkart के नाम पर धोखा",
+        "mr": "Flipkart च्या नावाने फसवणूक"
+      },
+      "description": "Flipkart impersonation"
+    },
+    {
+      "id": "r_paypal_impersonation",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "paypal.{0,40}(account|verify|limited|suspended|payment|receipt|transaction|refund)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "PayPal impersonation scam",
+        "hi": "PayPal के नाम पर धोखा",
+        "mr": "PayPal च्या नावाने फसवणूक"
+      },
+      "description": "PayPal impersonation"
+    },
+    {
+      "id": "r_google_impersonation",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "google.{0,40}(account|verify|suspended|hacked|reset|password).{0,40}(link|click|urgent)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Google account impersonation",
+        "hi": "Google account के नाम पर धोखा",
+        "mr": "Google account च्या नावाने फसवणूक"
+      },
+      "description": "Google account phishing"
+    },
+    {
+      "id": "r_apple_impersonation",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "apple.{0,40}(id|account|icloud|verify|locked|suspended|reset)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Apple ID impersonation",
+        "hi": "Apple ID के नाम पर धोखा",
+        "mr": "Apple ID च्या नावाने फसवणूक"
+      },
+      "description": "Apple ID phishing"
+    },
+    {
+      "id": "r_netflix_impersonation",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "netflix.{0,40}(subscription|payment|renew|expired|suspended|update\\s*payment)",
+      "flags": "i",
+      "weight": 35,
+      "localizedHint": {
+        "en": "Netflix subscription scam",
+        "hi": "Netflix सब्सक्रिप्शन घोटाला",
+        "mr": "Netflix सबस्क्रिप्शन फसवणूक"
+      },
+      "description": "Netflix phishing"
+    },
+    {
+      "id": "r_facebook_impersonation",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "(facebook|instagram|whatsapp).{0,40}(account|suspended|hacked|reset|verify|community\\s*standards)",
+      "flags": "i",
+      "weight": 35,
+      "localizedHint": {
+        "en": "Social media account phishing",
+        "hi": "सोशल मीडिया account फ़िशिंग",
+        "mr": "सोशल मीडिया account फिशिंग"
+      },
+      "description": "Social media phishing"
+    },
+    {
+      "id": "r_advance_fee_419",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "(nigeria|prince|royal\\s*family|inheritance|dying|late\\s*husband|wealthy|will).{0,60}(million|\\$|£|€|transfer|beneficiary|next\\s*of\\s*kin)",
+      "flags": "i",
+      "weight": 60,
+      "localizedHint": {
+        "en": "Classic Nigerian 419 advance-fee scam",
+        "hi": "नाइजीरियन 419 advance-fee घोटाला",
+        "mr": "नायजेरियन 419 advance-fee फसवणूक"
+      },
+      "description": "Nigerian 419 / advance fee fraud"
+    },
+    {
+      "id": "r_sextortion_scam",
+      "family": "digital_arrest",
+      "type": "regex",
+      "pattern": "(video\\s*(recorded|captured)|webcam|nude|obscene|explicit\\s*content).{0,60}(bitcoin|btc|payment|transfer|expose|leak|send.{0,20}(money|₹|\\$))",
+      "flags": "i",
+      "weight": 60,
+      "localizedHint": {
+        "en": "Sextortion / blackmail scam — DO NOT PAY",
+        "hi": "यौन शोषण / ब्लैकमेल घोटाला — पैसे मत भेजें",
+        "mr": "सेक्सटॉर्शन / ब्लॅकमेल फसवणूक — पैसे पाठवू नका"
+      },
+      "description": "Sextortion blackmail scam"
+    },
+    {
+      "id": "r_covid_vaccine_scam",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "(covid|vaccine|booster|cowin|corona).{0,50}(certificate|slot|register|verify|link|pending)",
+      "flags": "i",
+      "weight": 30,
+      "localizedHint": {
+        "en": "COVID vaccine certificate scam",
+        "hi": "COVID वैक्सीन सर्टिफिकेट घोटाला",
+        "mr": "COVID लस सर्टिफिकेट फसवणूक"
+      },
+      "description": "COVID vaccine scam"
+    },
+    {
+      "id": "r_scholarship_scam",
+      "family": "lottery",
+      "type": "regex",
+      "pattern": "(scholarship|education\\s*grant|study\\s*abroad|fellowship).{0,60}(selected|approved|winner|₹|\\$|fee|deposit)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Fake scholarship scam",
+        "hi": "नकली स्कॉलरशिप घोटाला",
+        "mr": "बनावट स्कॉलरशिप फसवणूक"
+      },
+      "description": "Scholarship scam"
+    },
+    {
+      "id": "r_pm_kisan_scam",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "(pm\\s*kisan|kisan\\s*samman|kisan\\s*yojana|farmer\\s*scheme).{0,50}(pending|verify|kyc|register|link|₹)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "PM Kisan / farmer scheme scam",
+        "hi": "PM किसान योजना का नकली संदेश",
+        "mr": "PM किसान योजनेचा बनावट संदेश"
+      },
+      "description": "PM Kisan scam"
+    },
+    {
+      "id": "r_hospital_emergency_scam",
+      "family": "digital_arrest",
+      "type": "keyword_proximity",
+      "pattern": "(hospital|accident|emergency|urgent\\s*surgery|icu)",
+      "secondaryPattern": "money|₹|\\$|transfer|send|urgent|now",
+      "proximityChars": 120,
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Fake hospital emergency money request",
+        "hi": "नकली hospital emergency + पैसे की माँग",
+        "mr": "बनावट hospital emergency + पैसे मागणी"
+      },
+      "description": "Hospital emergency scam"
+    },
+    {
+      "id": "r_govt_subsidy_scam",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "(government|govt|sarkari|centre|central).{0,40}(subsidy|scheme|yojana|benefit|grant).{0,40}(claim|link|apply|verify|approve)",
+      "flags": "i",
+      "weight": 35,
+      "localizedHint": {
+        "en": "Fake government subsidy/scheme scam",
+        "hi": "नकली सरकारी योजना/subsidy घोटाला",
+        "mr": "बनावट सरकारी योजना/subsidy फसवणूक"
+      },
+      "description": "Govt scheme scam"
+    },
+    {
+      "id": "r_donation_pmcares",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "(pm\\s*cares|pm-cares|prime\\s*minister\\s*cares).{0,40}(donate|donation|contribute|fund)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "PM CARES impersonation scam",
+        "hi": "PM CARES के नाम पर धोखा",
+        "mr": "PM CARES च्या नावाने फसवणूक"
+      },
+      "description": "PM CARES donation scam"
+    },
+    {
+      "id": "r_free_gift_iphone",
+      "family": "lottery",
+      "type": "regex",
+      "pattern": "(free|complimentary)\\s*(iphone|samsung|smartphone|laptop|gift\\s*card|voucher).{0,40}(click|link|claim|register|survey)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Fake 'free iPhone/gift' click-bait scam",
+        "hi": "'फ्री iPhone/गिफ्ट' का घोटाला",
+        "mr": "'फ्री iPhone/गिफ्ट' चा फसवणूक"
+      },
+      "description": "Free gift scam"
+    },
+    {
+      "id": "r_survey_scam",
+      "family": "lottery",
+      "type": "regex",
+      "pattern": "complete\\s*(this\\s*)?(survey|quiz|feedback).{0,40}(win|₹|\\$|prize|reward|iphone|gift)",
+      "flags": "i",
+      "weight": 35,
+      "localizedHint": {
+        "en": "Complete survey and win scam",
+        "hi": "'सर्वे पूरा करें और जीतें' घोटाला",
+        "mr": "'सर्वे पूर्ण करा आणि जिंका' फसवणूक"
+      },
+      "description": "Survey/quiz scam"
+    },
+    {
+      "id": "r_electricity_disconnect_call",
+      "family": "fake_challan",
+      "type": "keyword_proximity",
+      "pattern": "electricity|बिजली|वीज|power\\s*supply",
+      "secondaryPattern": "disconnect|cut\\s*off|shut\\s*down|9\\s*pm|tonight|कट",
+      "proximityChars": 60,
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "'Electricity will be cut tonight' scam call",
+        "hi": "'आज रात बिजली कट जाएगी' का घोटाला",
+        "mr": "'आज रात्री वीज कापली जाईल' चा फसवणूक"
+      },
+      "description": "Electricity disconnect timing scam"
+    },
+    {
+      "id": "r_ola_uber_impersonation",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "(ola|uber|rapido|zomato|swiggy).{0,40}(booking|refund|driver|partner|payment|cashback)",
+      "flags": "i",
+      "weight": 30,
+      "localizedHint": {
+        "en": "Ola/Uber/Zomato/Swiggy impersonation",
+        "hi": "Ola/Uber/Zomato/Swiggy के नाम पर धोखा",
+        "mr": "Ola/Uber/Zomato/Swiggy च्या नावाने फसवणूक"
+      },
+      "description": "Ride/food app impersonation"
+    },
+    {
+      "id": "r_qr_scan_urgent",
+      "family": "qr_impersonation",
+      "type": "regex",
+      "pattern": "scan\\s*(this\\s*)?qr.{0,40}(urgent|immediately|expire|last\\s*chance)",
+      "flags": "i",
+      "weight": 35,
+      "localizedHint": {
+        "en": "'Scan QR urgently' scam",
+        "hi": "'तुरंत QR स्कैन करें' — घोटाला",
+        "mr": "'त्वरित QR स्कॅन करा' — फसवणूक"
+      },
+      "description": "Urgent QR scan pressure"
+    },
+    {
+      "id": "r_upi_id_shared",
+      "family": "upi_collect_trap",
+      "type": "regex",
+      "pattern": "(pay\\s*to|send\\s*to|transfer\\s*to)\\s*[a-z0-9._-]+@(paytm|ybl|okaxis|okhdfcbank|okicici|oksbi|axl|ibl|apl|upi)",
+      "flags": "i",
+      "weight": 20,
+      "localizedHint": {
+        "en": "UPI ID shared in message — verify before paying",
+        "hi": "मैसेज में UPI ID शेयर हुआ — पहले पुष्टि करें",
+        "mr": "मेसेजमध्ये UPI ID शेअर केला — आधी खात्री करा"
+      },
+      "description": "Unsolicited UPI ID share"
+    },
+    {
+      "id": "r_bitcoin_wallet_address",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "\\b(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}\\b",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "Bitcoin wallet address in message — likely scam",
+        "hi": "मैसेज में Bitcoin wallet address — घोटाला",
+        "mr": "मेसेजमध्ये Bitcoin wallet address — फसवणूक"
+      },
+      "description": "Bitcoin address in text"
+    },
+    {
+      "id": "r_ethereum_wallet",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "\\b0x[a-fA-F0-9]{40}\\b",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "Ethereum wallet address in message — likely scam",
+        "hi": "मैसेज में Ethereum wallet — घोटाला",
+        "mr": "मेसेजमध्ये Ethereum wallet — फसवणूक"
+      },
+      "description": "Ethereum address in text"
+    },
+    {
+      "id": "r_gift_card_request",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "(google\\s*play|amazon|itunes|apple|steam)\\s*(gift\\s*card|voucher|code).{0,40}(buy|purchase|send|share|urgent)",
+      "flags": "i",
+      "weight": 55,
+      "localizedHint": {
+        "en": "Gift card purchase demand — classic scam",
+        "hi": "'गिफ्ट कार्ड खरीदो' — घोटाला",
+        "mr": "'गिफ्ट कार्ड खरेदी करा' — फसवणूक"
+      },
+      "description": "Gift card purchase scam"
+    },
+    {
+      "id": "r_boss_ceo_fraud",
+      "family": "phishing_link",
+      "type": "keyword_proximity",
+      "pattern": "(boss|ceo|manager|director|hr)",
+      "secondaryPattern": "urgent\\s*task|available|need\\s*favor|quiet|discreet|gift\\s*card",
+      "proximityChars": 100,
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "CEO/boss impersonation scam",
+        "hi": "'बॉस/CEO' के नाम पर धोखा",
+        "mr": "'बॉस/CEO' च्या नावाने फसवणूक"
+      },
+      "description": "CEO fraud / BEC"
+    },
+    {
+      "id": "r_deepfake_warning",
+      "family": "digital_arrest",
+      "type": "regex",
+      "pattern": "(voice\\s*clone|deepfake|ai\\s*voice|impersonate).{0,40}(family|son|daughter|kidnap|held)",
+      "flags": "i",
+      "weight": 60,
+      "localizedHint": {
+        "en": "AI voice / deepfake kidnapping scam",
+        "hi": "AI आवाज़ / deepfake अपहरण घोटाला",
+        "mr": "AI आवाज / deepfake अपहरण फसवणूक"
+      },
+      "description": "Deepfake kidnapping scam"
+    },
+    {
+      "id": "r_recovery_scam",
+      "family": "investment_group",
+      "type": "regex",
+      "pattern": "(recover|refund|get\\s*back).{0,40}(lost|scammed|frozen|stuck).{0,40}(money|funds|₹|\\$|crypto)",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "Fake 'recovery agent' scam (targets scam victims)",
+        "hi": "नकली 'recovery agent' घोटाला",
+        "mr": "बनावट 'recovery agent' फसवणूक"
+      },
+      "description": "Recovery scam (targets prior victims)"
+    },
+    {
+      "id": "r_wangiri_call",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "missed\\s*call.{0,40}(unknown|international|\\+\\d{7,}|call\\s*back)",
+      "flags": "i",
+      "weight": 20,
+      "localizedHint": {
+        "en": "Wangiri missed call scam (call back charges)",
+        "hi": "मिस्ड कॉल घोटाला (कॉल बैक पर चार्ज)",
+        "mr": "मिस्ड कॉल फसवणूक (कॉल बॅकवर चार्ज)"
+      },
+      "description": "Wangiri missed call scam"
+    },
+    {
+      "id": "r_urgency_english",
+      "family": "digital_arrest",
+      "type": "regex",
+      "pattern": "(final\\s*(notice|warning|reminder)|last\\s*chance|expires?\\s*(today|now|soon)|before.{0,10}(midnight|tonight|deadline))",
+      "flags": "i",
+      "weight": 15,
+      "localizedHint": {
+        "en": "Extreme deadline pressure",
+        "hi": "'आखिरी मौका/नोटिस' का दबाव",
+        "mr": "'शेवटची संधी/नोटिस' चा दबाव"
+      },
+      "description": "Deadline pressure"
+    },
+    {
+      "id": "r_click_here_urgent",
+      "family": "phishing_link",
+      "type": "keyword_proximity",
+      "pattern": "click\\s*(here|now|below|link)",
+      "secondaryPattern": "urgent|immediately|hurry|expire|last\\s*chance|verify",
+      "proximityChars": 60,
+      "flags": "i",
+      "weight": 25,
+      "localizedHint": {
+        "en": "'Click here urgently' — phishing template",
+        "hi": "'तुरंत click करें' — फ़िशिंग टेम्पलेट",
+        "mr": "'त्वरित click करा' — फिशिंग टेम्पलेट"
+      },
+      "description": "Urgent click pattern"
+    },
+    {
+      "id": "r_bank_transfer_error",
+      "family": "upi_collect_trap",
+      "type": "regex",
+      "pattern": "(wrongly|mistakenly|accidentally)\\s*(sent|transferred|credited).{0,40}(refund|return|send\\s*back)",
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "'Wrongly sent, refund it' scam",
+        "hi": "'गलती से पैसे भेजे, वापस करो' घोटाला",
+        "mr": "'चुकून पैसे पाठवले, परत करा' फसवणूक"
+      },
+      "description": "Wrong transfer refund scam"
+    },
+    {
+      "id": "r_qr_menu_scam",
+      "family": "qr_impersonation",
+      "type": "regex",
+      "pattern": "(restaurant|menu|order|table).{0,40}scan\\s*qr.{0,40}(pay|order|book)",
+      "flags": "i",
+      "weight": 15,
+      "localizedHint": {
+        "en": "QR menu scam — verify restaurant QR",
+        "hi": "QR मेनू घोटाला — रेस्तरां QR verify करें",
+        "mr": "QR मेनू फसवणूक — रेस्टॉरंट QR तपासा"
+      },
+      "description": "Fake restaurant QR"
+    },
+    {
+      "id": "r_govt_website_impersonation",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "(uidai|epfo|passport|driving\\s*license|voter\\s*id|ration\\s*card|passport|dgca).{0,40}(update|verify|renew|link|kyc)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Fake govt website impersonation",
+        "hi": "नकली सरकारी वेबसाइट का धोखा",
+        "mr": "बनावट सरकारी वेबसाइटची फसवणूक"
+      },
+      "description": "Govt website phishing"
+    },
+    {
+      "id": "r_school_college_fees",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "(school|college|university|fees|tuition).{0,40}(pending|due|penalty|scholarship|admission).{0,40}(link|pay|click)",
+      "flags": "i",
+      "weight": 30,
+      "localizedHint": {
+        "en": "Fake school/college fees scam",
+        "hi": "नकली स्कूल/कॉलेज fees घोटाला",
+        "mr": "बनावट शाळा/कॉलेज fees फसवणूक"
+      },
+      "description": "Education fees scam"
+    },
+    {
+      "id": "r_pension_scam",
+      "family": "fake_kyc",
+      "type": "regex",
+      "pattern": "pension.{0,40}(update|verify|kyc|pending|link|life\\s*certificate|jeevan\\s*pramaan)",
+      "flags": "i",
+      "weight": 40,
+      "localizedHint": {
+        "en": "Fake pension/life certificate scam",
+        "hi": "नकली pension/life certificate घोटाला",
+        "mr": "बनावट pension/life certificate फसवणूक"
+      },
+      "description": "Pension scam (elders)"
+    },
+    {
+      "id": "r_deepfake_call_family",
+      "family": "digital_arrest",
+      "type": "keyword_proximity",
+      "pattern": "(son|daughter|nephew|niece|grandson|granddaughter|beta|beti)",
+      "secondaryPattern": "kidnap|held|arrested|accident|emergency|money|₹|\\$|urgent",
+      "proximityChars": 120,
+      "flags": "i",
+      "weight": 45,
+      "localizedHint": {
+        "en": "'Family member kidnapped/arrested' scam",
+        "hi": "'बच्चे को अपहरण/गिरफ्तार' घोटाला",
+        "mr": "'मुलाला अपहरण/अटक' फसवणूक"
+      },
+      "description": "Family emergency scam"
+    },
+    {
+      "id": "r_smishing_short_url",
+      "family": "phishing_link",
+      "type": "regex",
+      "pattern": "^.{0,60}(https?://[a-z0-9-]{1,15}\\.[a-z]{2,6})",
+      "flags": "i",
+      "weight": 10,
+      "localizedHint": {
+        "en": "Very short URL in message — verify before clicking",
+        "hi": "बहुत छोटा URL — click से पहले verify करें",
+        "mr": "खूप लहान URL — click पूर्वी verify करा"
+      },
+      "description": "Suspicious short URL"
+    }
+  ]
+}

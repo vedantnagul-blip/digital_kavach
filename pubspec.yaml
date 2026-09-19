@@ -1,0 +1,80 @@
+name: digital_kavach
+description: "Digital Kavach — AI-powered scam detection & fraud recovery app for India (Android v1)."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  # State & Routing
+  flutter_riverpod: ^2.5.1
+  go_router: ^14.0.0
+
+  # Local Storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.3
+  shared_preferences: ^2.2.3
+  crypto: ^3.0.3
+
+  # Firebase
+  firebase_core: ^3.1.0
+  firebase_auth: ^5.1.0
+  firebase_crashlytics: ^4.0.1
+  cloud_firestore: ^5.0.1
+  google_sign_in: ^6.2.1
+
+  # Intake, OCR, QR
+  receive_sharing_intent: ^1.8.0
+  mobile_scanner: ^5.1.1
+  image_picker: ^1.1.2
+  google_mlkit_text_recognition: ^0.13.0
+  google_mlkit_barcode_scanning: ^0.12.0
+
+  # AI
+  google_generative_ai: ^0.4.0
+  http: ^1.2.1
+
+  # Background & Notifications
+  workmanager: ^0.5.2
+  flutter_local_notifications: ^17.1.2
+  timezone: ^0.9.4
+
+  # UX / Utils
+  flutter_tts: ^4.0.2
+  url_launcher: ^6.3.0
+  pdf: ^3.10.8
+  printing: ^5.13.0
+  share_plus: ^9.0.0
+  intl: ^0.19.0
+  device_info_plus: ^10.1.0
+  package_info_plus: ^8.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  mocktail: ^1.0.4
+  fake_cloud_firestore: ^3.0.0
+
+flutter_launcher_icons:
+  android: true
+  image_path: "assets/icon/kavach_icon.png"
+  adaptive_icon_background: "#E85D04"
+  adaptive_icon_foreground: "assets/icon/kavach_foreground.png"
+
+flutter_native_splash:
+  color: "#E85D04"
+  image: "assets/icon/kavach_splash.png"
+  android: true
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/rules.json

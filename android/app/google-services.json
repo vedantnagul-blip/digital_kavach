@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "808666042974",
+    "project_id": "digital-kavach-bdcbb",
+    "storage_bucket": "digital-kavach-bdcbb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:808666042974:android:addb32a0a54c257bb61acf",
+        "android_client_info": {
+          "package_name": "com.digitalkavach.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "808666042974-6e0lec1899fk8u2pdjar1v0sgsum9cnu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.digitalkavach.app",
+            "certificate_hash": "88f7ecfb4801758e252641eb620fc5f18bca1d01"
+          }
+        },
+        {
+          "client_id": "808666042974-gcdeinfh9uugrvvb13it54978n6k8qtr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBr7J7ztVavRoCqK9QM_RLvFPkV6xoT-nQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "808666042974-gcdeinfh9uugrvvb13it54978n6k8qtr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
