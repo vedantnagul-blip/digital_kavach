@@ -4,23 +4,25 @@ import '../../../data/rules/rule.dart';
 import '../../../data/rules/score_aggregator.dart';
 
 /// Which engine produced this verdict.
-enum AiProvider { tier1, gemini, grok, cached }
+enum AiProvider { tier1, gemini, grok, chatgpt, cached }
 
 extension AiProviderX on AiProvider {
   String get wire {
     switch (this) {
-      case AiProvider.tier1:  return 'tier1';
-      case AiProvider.gemini: return 'gemini';
-      case AiProvider.grok:   return 'grok';
-      case AiProvider.cached: return 'cached';
+      case AiProvider.tier1:   return 'tier1';
+      case AiProvider.gemini:  return 'gemini';
+      case AiProvider.grok:    return 'grok';
+      case AiProvider.chatgpt: return 'chatgpt';
+      case AiProvider.cached:  return 'cached';
     }
   }
   static AiProvider fromWire(String? s) {
     switch (s) {
-      case 'gemini': return AiProvider.gemini;
-      case 'grok':   return AiProvider.grok;
-      case 'cached': return AiProvider.cached;
-      default:       return AiProvider.tier1;
+      case 'gemini':  return AiProvider.gemini;
+      case 'grok':    return AiProvider.grok;
+      case 'chatgpt': return AiProvider.chatgpt;
+      case 'cached':  return AiProvider.cached;
+      default:        return AiProvider.tier1;
     }
   }
 }

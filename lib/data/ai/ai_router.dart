@@ -15,6 +15,7 @@ import '../../features/scanner/models/verdict.dart';
 import 'ai_keys_store.dart';
 import 'ai_provider.dart';
 import 'budget_guard.dart';
+import 'chatgpt_provider.dart';
 import 'circuit_breaker.dart';
 import 'gemini_provider.dart';
 import 'grok_provider.dart';
@@ -28,6 +29,7 @@ final Provider<AiRouter> aiRouterProvider = Provider<AiRouter>((Ref ref) {
     prefs: ref.watch(userPrefsProvider),
     grokBreaker: CircuitBreaker(aiBox, provider: 'grok'),
     geminiBreaker: CircuitBreaker(aiBox, provider: 'gemini'),
+    chatgptBreaker: CircuitBreaker(aiBox, provider: 'chatgpt'),
     budget: BudgetGuard(aiBox),
     firestore: FirebaseFirestore.instance,
   );
@@ -64,6 +66,7 @@ class AiRouter {
     required this.prefs,
     required this.grokBreaker,
     required this.geminiBreaker,
+    required this.chatgptBreaker,
     required this.budget,
     required this.firestore,
   });
@@ -73,6 +76,7 @@ class AiRouter {
   final UserPrefs prefs;
   final CircuitBreaker grokBreaker;
   final CircuitBreaker geminiBreaker;
+  final CircuitBreaker chatgptBreaker;
   final BudgetGuard budget;
   final FirebaseFirestore firestore;
 
@@ -143,6 +147,7 @@ class AiRouter {
     // seamlessly rely on the on-device Tier-1 Rule Engine without crashing or erroring.
     final AiConfig config = await keysStore.getConfig();
     final bool hasCloudKey = (config.geminiKey != null && config.geminiKey!.trim().isNotEmpty) ||
+        (config.chatgptKey != null && config.chatgptKey!.trim().isNotEmpty) ||
         (config.grokKey != null && config.grokKey!.trim().isNotEmpty);
 
     if (!hasCloudKey && !forceAi) {
@@ -184,8 +189,6 @@ class AiRouter {
       );
     } on KavachException catch (e) {
       AppLogger.w('Hybrid: AI failed, using Tier-1 result: $e');
-      // When Tier-1 already has a definitive detection and user didn't force AI,
-      // smoothly treat it as an on-device success without showing an error box.
       if (!forceAi) {
         return HybridScanResult(
           finalVerdict: tier1Verdict,
@@ -211,24 +214,14 @@ class AiRouter {
   }) {
     if (forceAi) return true;
 
-    // For images/screenshots with attached visual bytes, AI vision is essential
-    // unless the offline engine is already certain it's a high-confidence RED.
     if (hasImage && !(tier1.level == VerdictLevel.red && tier1.score >= 80)) {
       return true;
     }
 
-    // Always call AI for AMBER (uncertain) results
     if (tier1.level == VerdictLevel.amber) return true;
-
-    // For RED with borderline score (60-79), get AI confirmation
     if (tier1.level == VerdictLevel.red && tier1.score < 80) return true;
-
-    // For very high confidence RED (≥80), skip AI (already confident)
     if (tier1.level == VerdictLevel.red && tier1.score >= 80) return false;
 
-    // Novel / Unknown Pattern Guardrail:
-    // If text contains URLs, APK mentions, or external actions, invoke AI
-    // to evaluate zero-day threats even if offline regex scored low.
     if (rawText != null) {
       final String lower = rawText.toLowerCase();
       final bool hasExternalLink = lower.contains('http://') ||
@@ -246,10 +239,8 @@ class AiRouter {
       if (hasExternalLink) return true;
     }
 
-    // For clear GREEN (score < 15), skip AI (obviously safe)
     if (tier1.level == VerdictLevel.green && tier1.score < 15) return false;
 
-    // For borderline GREEN (15-24), call AI to be safe
     return true;
   }
 
@@ -264,7 +255,7 @@ class AiRouter {
     return 'AI not required';
   }
 
-  /// Direct AI scan (used by [hybridAnalyze] and Force AI button)
+  /// Direct AI scan (cascades: Gemini -> ChatGPT -> Grok/Groq)
   Future<Verdict> analyze(ScanRequest req) async {
     if (prefs.consentAi == false) {
       throw const NoProviderException('AI disabled by user consent');
@@ -281,12 +272,10 @@ class AiRouter {
       );
     }
 
-    // ── STEP 2: Cloud cache DISABLED (Phase 09 decision) ──
-    // All caching is local-only via Hive.
     final AiConfig config = await keysStore.getConfig();
     KavachException? lastError;
 
-    // ── STEP 3: Gemini (PRIMARY per spec §4.3) ──
+    // ── STEP 2: Gemini (PRIMARY) ──
     if (config.geminiKey != null &&
         config.geminiKey!.isNotEmpty &&
         !geminiBreaker.isOpen()) {
@@ -308,13 +297,35 @@ class AiRouter {
       }
     }
 
-    // ── STEP 4: Grok (FALLBACK per spec §4.4) ──
+    // ── STEP 3: ChatGPT / OpenAI (FALLBACK 1) ──
+    if (config.chatgptKey != null &&
+        config.chatgptKey!.isNotEmpty &&
+        !chatgptBreaker.isOpen()) {
+      try {
+        AppLogger.i('Attempting Fallback AI: ChatGPT', tag: 'ai');
+        final AiProviderClient chatgpt = ChatGptProvider(
+          apiKey: config.chatgptKey!,
+          modelId: config.chatgptModel,
+        );
+        final Verdict v = await chatgpt.analyze(req);
+        await chatgptBreaker.recordSuccess();
+        await _saveVerdictLocal(hash, v, req.text);
+        AppLogger.i('ChatGPT SUCCESS', tag: 'ai');
+        return v;
+      } on KavachException catch (e) {
+        AppLogger.w('ChatGPT fallback failed: $e', tag: 'ai');
+        await chatgptBreaker.recordFailure();
+        lastError = e;
+      }
+    }
+
+    // ── STEP 4: Grok / Groq (FALLBACK 2) ──
     if (config.grokKey != null &&
         config.grokKey!.isNotEmpty &&
         budget.canCall() &&
         !grokBreaker.isOpen()) {
       try {
-        AppLogger.i('Attempting Fallback AI: Grok', tag: 'ai');
+        AppLogger.i('Attempting Fallback AI: Grok/Groq', tag: 'ai');
         final AiProviderClient grok = GrokProvider(
           apiKey: config.grokKey!,
           modelId: config.grokModel,
@@ -323,7 +334,7 @@ class AiRouter {
         await grokBreaker.recordSuccess();
         await budget.recordCall();
         await _saveVerdictLocal(hash, v, req.text);
-        AppLogger.i('Grok FALLBACK SUCCESS', tag: 'ai');
+        AppLogger.i('Grok/Groq FALLBACK SUCCESS', tag: 'ai');
         return v;
       } on KavachException catch (e) {
         AppLogger.w('Grok fallback failed: $e', tag: 'ai');
@@ -377,7 +388,10 @@ class AiRouter {
   }
 
   Future<bool> secondOpinion(ScanRequest req, Verdict primaryVerdict) async {
-    if (primaryVerdict.provider.provider != AiProvider.grok) return false;
+    if (primaryVerdict.provider.provider != AiProvider.grok &&
+        primaryVerdict.provider.provider != AiProvider.chatgpt) {
+      return false;
+    }
     final AiConfig config = await keysStore.getConfig();
     if (config.geminiKey == null ||
         config.geminiKey!.isEmpty ||

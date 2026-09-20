@@ -5,11 +5,10 @@
 ///
 /// ```bash
 /// flutter build apk --release \
+///   --dart-define=CHATGPT_API_KEY="sk-..." \
 ///   --dart-define=GROQ_API_KEY="gsk_..." \
 ///   --dart-define=GEMINI_API_KEY="AIza..."
 /// ```
-///
-/// Or configured with default values for pre-configured internal builds.
 class ApiKeys {
   const ApiKeys._();
 
@@ -31,6 +30,12 @@ class ApiKeys {
     defaultValue: '',
   );
 
+  /// OpenAI / ChatGPT API Key (https://platform.openai.com)
+  static const String chatgpt = String.fromEnvironment(
+    'CHATGPT_API_KEY',
+    defaultValue: String.fromEnvironment('OPENAI_API_KEY', defaultValue: ''),
+  );
+
   /// Gemini model identifier (Production stable: gemini-1.5-flash)
   static const String geminiModel = String.fromEnvironment(
     'GEMINI_MODEL',
@@ -43,9 +48,15 @@ class ApiKeys {
     defaultValue: 'llama-3.3-70b-versatile',
   );
 
-  /// Grok model identifier
+  /// Grok model identifier (alias for backwards compatibility)
   static const String grokModel = String.fromEnvironment(
     'GROK_MODEL',
     defaultValue: 'llama-3.3-70b-versatile',
+  );
+
+  /// ChatGPT model identifier
+  static const String chatgptModel = String.fromEnvironment(
+    'CHATGPT_MODEL',
+    defaultValue: 'gpt-4o-mini',
   );
 }

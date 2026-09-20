@@ -25,6 +25,11 @@ class ProviderChip extends StatelessWidget {
           label: info.model == null ? 'Grok' : 'Grok · ${info.model}',
           icon: Icons.psychology_alt_rounded,
         );
+      case AiProvider.chatgpt:
+        return InfoChip(
+          label: info.model == null ? 'ChatGPT' : 'ChatGPT · ${info.model}',
+          icon: Icons.psychology_rounded,
+        );
       case AiProvider.cached:
         return const InfoChip(
           label: 'Cached verdict',
