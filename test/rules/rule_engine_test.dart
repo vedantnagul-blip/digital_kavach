@@ -22,7 +22,7 @@ void main() {
       final result = engine.run(input);
       expect(result.level, equals(VerdictLevel.red));
       expect(result.score, greaterThanOrEqualTo(60));
-      expect(result.hits.any((h) => h.family == 'digital_arrest'), isTrue);
+      expect(result.hits.any((h) => h.family == ScamFamily.digital_arrest), isTrue);
     });
 
     test('detects Digital Arrest scam in Hindi', () {
@@ -34,7 +34,7 @@ void main() {
 
       final result = engine.run(input);
       expect(result.level, equals(VerdictLevel.red));
-      expect(result.hits.any((h) => h.family == 'digital_arrest'), isTrue);
+      expect(result.hits.any((h) => h.family == ScamFamily.digital_arrest), isTrue);
     });
 
     test('detects Fake KYC suspension trap', () {
@@ -45,7 +45,7 @@ void main() {
 
       final result = engine.run(input);
       expect(result.level, anyOf(equals(VerdictLevel.red), equals(VerdictLevel.amber)));
-      expect(result.hits.any((h) => h.family == 'fake_kyc' || h.family == 'phishing_link'), isTrue);
+      expect(result.hits.any((h) => h.family == ScamFamily.fake_kyc || h.family == ScamFamily.phishing_link), isTrue);
     });
 
     test('detects UPI receive trap (asking PIN to receive money)', () {
@@ -56,7 +56,7 @@ void main() {
 
       final result = engine.run(input);
       expect(result.level, equals(VerdictLevel.red));
-      expect(result.hits.any((h) => h.family == 'upi_collect_trap'), isTrue);
+      expect(result.hits.any((h) => h.family == ScamFamily.upi_collect_trap), isTrue);
     });
 
     test('does not flag normal conversational messages (low false-positive)', () {
