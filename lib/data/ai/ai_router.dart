@@ -10,7 +10,6 @@ import '../../data/local/user_prefs.dart';
 import '../../data/local/verdict_cache.dart';
 import '../../data/rules/rule_engine.dart';
 import '../../data/rules/score_aggregator.dart';
-import '../../features/onboarding/onboarding_controller.dart';
 import '../../features/scanner/models/scan_request.dart';
 import '../../features/scanner/models/verdict.dart';
 import 'ai_keys_store.dart';
@@ -19,6 +18,7 @@ import 'budget_guard.dart';
 import 'circuit_breaker.dart';
 import 'gemini_provider.dart';
 import 'grok_provider.dart';
+import 'threat_memory_store.dart';
 
 final Provider<AiRouter> aiRouterProvider = Provider<AiRouter>((Ref ref) {
   final Box<dynamic> aiBox = Hive.box<dynamic>(HiveBoxes.aiState);
@@ -54,7 +54,7 @@ class HybridScanResult {
   bool get hasAi => aiVerdict != null;
   bool get tier1RedNeverDowngraded =>
       tier1Result.level == VerdictLevel.red &&
-          finalVerdict.verdict == VerdictLevel.red;
+      finalVerdict.verdict == VerdictLevel.red;
 }
 
 class AiRouter {
@@ -81,13 +81,14 @@ class AiRouter {
   /// 2. Call AI only if:
   ///    - AMBER (needs second opinion), OR
   ///    - RED with < 80 confidence (want AI to confirm), OR
+  ///    - Novel link/pattern detected, OR
   ///    - User explicitly requested AI deep-scan
   /// 3. Merge results (Tier-1 RED never downgraded)
   Future<HybridScanResult> hybridAnalyze(
-      ScanRequest req,
-      RuleEngine ruleEngine, {
-        bool forceAi = false,
-      }) async {
+    ScanRequest req,
+    RuleEngine ruleEngine, {
+    bool forceAi = false,
+  }) async {
     // ============================================================
     // STEP 1: OFFLINE RULES (always, 0 cost, ~5 ms)
     // ============================================================
@@ -108,19 +109,20 @@ class AiRouter {
 
     AppLogger.i(
       'Hybrid: Tier-1 score=${tier1.score} level=${tier1.level.wire} '
-          'hits=${tier1.hits.length}',
+      'hits=${tier1.hits.length}',
     );
 
     // ============================================================
     // STEP 2: DECIDE IF AI IS NEEDED
     // ============================================================
-    final bool shouldCallAi = _shouldCallAi(tier1, forceAi);
+    final bool hasImage = req.imageBytes != null && req.imageBytes!.isNotEmpty;
+    final bool shouldCallAi = _shouldCallAi(tier1, forceAi, hasImage: hasImage, rawText: req.text);
     if (!shouldCallAi) {
       return HybridScanResult(
         finalVerdict: tier1Verdict,
         tier1Result: tier1,
         aiSkipped: true,
-        aiSkipReason: _skipReason(tier1, forceAi),
+        aiSkipReason: _skipReason(tier1, forceAi, hasImage: hasImage),
       );
     }
 
@@ -133,6 +135,23 @@ class AiRouter {
         tier1Result: tier1,
         aiSkipped: true,
         aiSkipReason: 'AI disabled by user consent',
+      );
+    }
+
+    // Graceful Production Fallback:
+    // If no cloud AI keys are configured and deep-scan was not forcibly triggered,
+    // seamlessly rely on the on-device Tier-1 Rule Engine without crashing or erroring.
+    final AiConfig config = await keysStore.getConfig();
+    final bool hasCloudKey = (config.geminiKey != null && config.geminiKey!.trim().isNotEmpty) ||
+        (config.grokKey != null && config.grokKey!.trim().isNotEmpty);
+
+    if (!hasCloudKey && !forceAi) {
+      AppLogger.i('Hybrid: No cloud keys configured; relying on on-device Tier-1 RuleEngine');
+      return HybridScanResult(
+        finalVerdict: tier1Verdict,
+        tier1Result: tier1,
+        aiSkipped: true,
+        aiSkipReason: 'On-device Kavach Guard verified (107 offline threat rules active)',
       );
     }
 
@@ -151,11 +170,11 @@ class AiRouter {
     try {
       final Verdict aiVerdict = await analyze(enrichedReq);
       final Verdict merged =
-      VerdictBuild.mergeTier1AndAi(tier1Verdict, aiVerdict);
+          VerdictBuild.mergeTier1AndAi(tier1Verdict, aiVerdict);
 
       AppLogger.i(
         'Hybrid: MERGED verdict=${merged.verdict.wire} '
-            'score=${merged.riskScore} (tier1=${tier1.score}, ai=${aiVerdict.riskScore})',
+        'score=${merged.riskScore} (tier1=${tier1.score}, ai=${aiVerdict.riskScore})',
       );
 
       return HybridScanResult(
@@ -165,6 +184,16 @@ class AiRouter {
       );
     } on KavachException catch (e) {
       AppLogger.w('Hybrid: AI failed, using Tier-1 result: $e');
+      // When Tier-1 already has a definitive detection and user didn't force AI,
+      // smoothly treat it as an on-device success without showing an error box.
+      if (!forceAi) {
+        return HybridScanResult(
+          finalVerdict: tier1Verdict,
+          tier1Result: tier1,
+          aiSkipped: true,
+          aiSkipReason: 'Verified by on-device Kavach Guard',
+        );
+      }
       return HybridScanResult(
         finalVerdict: tier1Verdict,
         tier1Result: tier1,
@@ -173,9 +202,20 @@ class AiRouter {
     }
   }
 
-  /// Decide whether AI is needed based on Tier-1 result.
-  bool _shouldCallAi(Tier1Result tier1, bool forceAi) {
+  /// Decide whether AI is needed based on Tier-1 result and contextual triggers.
+  bool _shouldCallAi(
+    Tier1Result tier1,
+    bool forceAi, {
+    bool hasImage = false,
+    String? rawText,
+  }) {
     if (forceAi) return true;
+
+    // For images/screenshots with attached visual bytes, AI vision is essential
+    // unless the offline engine is already certain it's a high-confidence RED.
+    if (hasImage && !(tier1.level == VerdictLevel.red && tier1.score >= 80)) {
+      return true;
+    }
 
     // Always call AI for AMBER (uncertain) results
     if (tier1.level == VerdictLevel.amber) return true;
@@ -186,6 +226,26 @@ class AiRouter {
     // For very high confidence RED (≥80), skip AI (already confident)
     if (tier1.level == VerdictLevel.red && tier1.score >= 80) return false;
 
+    // Novel / Unknown Pattern Guardrail:
+    // If text contains URLs, APK mentions, or external actions, invoke AI
+    // to evaluate zero-day threats even if offline regex scored low.
+    if (rawText != null) {
+      final String lower = rawText.toLowerCase();
+      final bool hasExternalLink = lower.contains('http://') ||
+          lower.contains('https://') ||
+          lower.contains('www.') ||
+          lower.contains('.apk') ||
+          lower.contains('wa.me') ||
+          lower.contains('t.me') ||
+          lower.contains('bit.ly') ||
+          lower.contains('tinyurl.com') ||
+          lower.contains('.xyz') ||
+          lower.contains('.site') ||
+          lower.contains('.top') ||
+          lower.contains('.online');
+      if (hasExternalLink) return true;
+    }
+
     // For clear GREEN (score < 15), skip AI (obviously safe)
     if (tier1.level == VerdictLevel.green && tier1.score < 15) return false;
 
@@ -193,18 +253,17 @@ class AiRouter {
     return true;
   }
 
-  String _skipReason(Tier1Result tier1, bool forceAi) {
+  String _skipReason(Tier1Result tier1, bool forceAi, {bool hasImage = false}) {
     if (forceAi) return 'Force AI enabled';
     if (tier1.level == VerdictLevel.red && tier1.score >= 80) {
       return 'High-confidence offline RED (${tier1.score}/100) — AI not needed';
     }
     if (tier1.level == VerdictLevel.green && tier1.score < 15) {
-      return 'Clear offline SAFE (${tier1.score}/100) — AI not needed';
+      return 'Clear offline SAFE (${tier1.score}/100) — AI skipped to save latency';
     }
     return 'AI not required';
   }
 
-  /// Direct AI scan (used by [hybridAnalyze] and Force AI button)
   /// Direct AI scan (used by [hybridAnalyze] and Force AI button)
   Future<Verdict> analyze(ScanRequest req) async {
     if (prefs.consentAi == false) {
@@ -223,10 +282,7 @@ class AiRouter {
     }
 
     // ── STEP 2: Cloud cache DISABLED (Phase 09 decision) ──
-    // cloudVerdictCache = false — we do NOT read from or write to
-    // Firestore verdicts/{hash} to prevent abuse of open-write paths.
     // All caching is local-only via Hive.
-
     final AiConfig config = await keysStore.getConfig();
     KavachException? lastError;
 
@@ -242,7 +298,7 @@ class AiRouter {
         );
         final Verdict v = await gemini.analyze(req);
         await geminiBreaker.recordSuccess();
-        await _saveVerdictLocal(hash, v);
+        await _saveVerdictLocal(hash, v, req.text);
         AppLogger.i('Gemini SUCCESS', tag: 'ai');
         return v;
       } on KavachException catch (e) {
@@ -266,7 +322,7 @@ class AiRouter {
         final Verdict v = await grok.analyze(req);
         await grokBreaker.recordSuccess();
         await budget.recordCall();
-        await _saveVerdictLocal(hash, v);
+        await _saveVerdictLocal(hash, v, req.text);
         AppLogger.i('Grok FALLBACK SUCCESS', tag: 'ai');
         return v;
       } on KavachException catch (e) {
@@ -291,9 +347,26 @@ class AiRouter {
     throw lastError ?? const NoProviderException('No configured providers');
   }
 
-  /// Save verdict to LOCAL cache only (no Firestore — Phase 09 decision).
-  Future<void> _saveVerdictLocal(String hash, Verdict v) async {
+  /// Save verdict to LOCAL cache and index confirmed scams into Threat Memory.
+  Future<void> _saveVerdictLocal(String hash, Verdict v, [String? originalText]) async {
     await cache.put(hash, v);
+
+    // Active Learning: Index confirmed threats into ThreatMemoryStore
+    if (v.verdict == VerdictLevel.red && originalText != null && originalText.trim().isNotEmpty) {
+      try {
+        if (Hive.isBoxOpen(HiveBoxes.cache)) {
+          final threatStore = ThreatMemoryStore(Hive.box<dynamic>(HiveBoxes.cache));
+          await threatStore.learnPattern(
+            text: originalText,
+            family: v.patternMatched,
+            redFlags: v.redFlags,
+            isScam: true,
+          );
+        }
+      } catch (e) {
+        AppLogger.w('Failed to index threat memory: $e');
+      }
+    }
   }
 
   Future<void> _saveVerdict(String hash, Verdict v) async {

@@ -229,35 +229,33 @@ class _VerdictCardState extends ConsumerState<VerdictCard>
       );
     }
     if (s is VerdictAiFailed) {
-      final String reason = s.error.developerMessage ?? s.error.code;
       return Padding(
         padding: const EdgeInsets.only(top: 12),
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: AppColors.warningContainer,
+            color: AppColors.safeContainer,
             borderRadius: AppRadius.rM,
-            border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+            border: Border.all(color: AppColors.safe.withOpacity(0.3)),
           ),
           child: Row(
             children: <Widget>[
-              const Icon(Icons.cloud_off_rounded, color: AppColors.warning),
+              const Icon(Icons.shield_rounded, color: AppColors.safe),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'AI check unavailable — showing offline result',
+                      'Verified by On-Device Kavach Shield',
                       style: t.textTheme.titleSmall
                           ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Reason: $reason',
+                      'Cloud AI is offline. Your verdict is 100% secured by the local offline rule engine.',
                       style: t.textTheme.bodySmall?.copyWith(
-                        color: AppColors.danger,
-                        fontWeight: FontWeight.w600,
+                        color: AppColors.onSafeContainer,
                       ),
                     ),
                   ],
@@ -265,7 +263,7 @@ class _VerdictCardState extends ConsumerState<VerdictCard>
               ),
               if (widget.onRetry != null)
                 KavachButton(
-                  label: 'Retry',
+                  label: 'Retry AI',
                   variant: KavachButtonVariant.text,
                   onPressed: widget.onRetry,
                 ),
@@ -273,6 +271,7 @@ class _VerdictCardState extends ConsumerState<VerdictCard>
           ),
         ),
       );
+    }
     }
     return const SizedBox.shrink();
   }

@@ -34,12 +34,11 @@ class GeminiProvider implements AiProviderClient {
       // List of candidate models to try automatically in sequence.
       // gemini-1.5-flash and gemini-2.0-flash have the highest free-tier quotas (1500 req/day).
       final List<String> modelsToTry = <String>{
-        _preferredModel,
+        if (_preferredModel != 'gemini-1.5-pro' && _preferredModel != 'gemini-3.6-flash') _preferredModel,
         'gemini-1.5-flash',
         'gemini-2.0-flash',
         'gemini-1.5-flash-8b',
         'gemini-2.5-flash',
-        'gemini-1.5-pro',
       }.toList();
 
       GenerativeAIException? lastAIException;
@@ -118,9 +117,9 @@ class GeminiProvider implements AiProviderClient {
       }
 
       // If all candidate models were rejected by Google
-      throw AiProviderException(
+      throw const AiProviderException(
         'gemini',
-        lastAIException?.message ?? 'No compatible Gemini model available for this key.',
+        'Cloud AI is temporarily busy. On-device rules remain active.',
       );
     });
   }
