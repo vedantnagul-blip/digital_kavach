@@ -102,6 +102,13 @@ class DigitalKavachApp extends ConsumerWidget {
           Locale('en'),
           Locale('hi'),
           Locale('mr'),
+          Locale('ta'),
+          Locale('te'),
+          Locale('bn'),
+          Locale('gu'),
+          Locale('kn'),
+          Locale('ml'),
+          Locale('pa'),
         ],
         localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
           GlobalMaterialLocalizations.delegate,

@@ -123,7 +123,7 @@ class ChatGptProvider implements AiProviderClient {
                 jsonDecode(res.body) as Map<String, dynamic>;
             final String content =
                 j['choices'][0]['message']['content'] as String;
-            return VerdictParser.parse(content, AiProvider.grok, currentModel);
+            return VerdictParser.parse(content, AiProvider.chatgpt, currentModel);
           }
 
           // Error handling

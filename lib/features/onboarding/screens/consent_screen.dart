@@ -17,12 +17,6 @@ import '../widgets/consent_checklist.dart';
 import '../widgets/step_progress_bar.dart';
 import 'signin_screen.dart';
 
-final Provider<UserRepo> userRepoProvider = Provider<UserRepo>(
-      (Ref<UserRepo> ref) => throw UnimplementedError(
-    'userRepoProvider must be overridden with a UserRepo(FirebaseFirestore.instance) in bootstrap',
-  ),
-);
-
 class ConsentScreen extends ConsumerStatefulWidget {
   const ConsentScreen({super.key});
   @override
@@ -73,6 +67,8 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
   Widget build(BuildContext context) {
     final OnboardingStrings s = ref.watch(onboardingStringsProvider);
     final OnboardingState state = ref.watch(onboardingControllerProvider);
+    final OnboardingController ctrl =
+        ref.read(onboardingControllerProvider.notifier);
     final ThemeData t = Theme.of(context);
     final L10n l10n = ref.watch(l10nProvider);
 
@@ -85,6 +81,13 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
     if (_error != null) {
       return KavachScaffold(
         title: Text(l10n.strings.appName),
+        leading: ctrl.canGoBack
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_rounded),
+                onPressed: ctrl.back,
+              )
+            : null,
+        scrollable: true,
         body: ErrorStateView(
           error: _error!,
           onRetry: () => setState(() => _error = null),
@@ -94,6 +97,12 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
 
     return KavachScaffold(
       title: Text(l10n.strings.appName),
+      leading: ctrl.canGoBack
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              onPressed: ctrl.back,
+            )
+          : null,
       scrollable: true,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       body: Column(
@@ -104,7 +113,7 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
           Text(s.consentTitle, style: t.textTheme.headlineSmall),
           const SizedBox(height: 4),
           Text(s.consentSubtitle, style: t.textTheme.bodyMedium),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           ConsentChecklistItem(
             icon: Icons.notifications_active_rounded,
             title: s.consentReadTitle,
@@ -126,7 +135,7 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
             title: s.consentStorageTitle,
             body: s.consentStorageBody,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 14),
           KavachButton(
             label: s.consentAllow,
             icon: Icons.verified_rounded,
@@ -140,12 +149,15 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
             expand: true,
             onPressed: () => _choose(false),
           ),
-          const SizedBox(height: 16),
-          Text(
-            s.consentFooter,
-            style: t.textTheme.bodySmall,
-            textAlign: TextAlign.center,
+          const SizedBox(height: 14),
+          Center(
+            child: Text(
+              s.consentFooter,
+              style: t.textTheme.bodySmall,
+              textAlign: TextAlign.center,
+            ),
           ),
+          const SizedBox(height: 32),
         ],
       ),
     );

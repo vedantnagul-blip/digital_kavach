@@ -388,7 +388,8 @@ class AiRouter {
   }
 
   Future<bool> secondOpinion(ScanRequest req, Verdict primaryVerdict) async {
-    if (primaryVerdict.provider.provider != AiProvider.grok) {
+    if (primaryVerdict.provider.provider != AiProvider.grok &&
+        primaryVerdict.provider.provider != AiProvider.chatgpt) {
       return false;
     }
     final AiConfig config = await keysStore.getConfig();

@@ -20,13 +20,13 @@ class ConsentChecklistItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData t = Theme.of(context);
     final Color bg = emphasize
-        ? t.colorScheme.errorContainer
+        ? t.colorScheme.errorContainer.withOpacity(0.4)
         : t.colorScheme.surfaceContainerHighest;
     final Color fg = emphasize ? t.colorScheme.error : t.colorScheme.primary;
 
     return Container(
-      padding: const EdgeInsets.all(14),
-      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: AppRadius.rL,
@@ -36,22 +36,29 @@ class ConsentChecklistItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           CircleAvatar(
-            radius: 18,
+            radius: 16,
             backgroundColor: fg.withOpacity(0.15),
-            child: Icon(icon, color: fg, size: 20),
+            child: Icon(icon, color: fg, size: 18),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Text(
                   title,
-                  style: t.textTheme.titleSmall
-                      ?.copyWith(fontWeight: FontWeight.w700),
+                  style: t.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                const SizedBox(height: 4),
-                Text(body, style: t.textTheme.bodyMedium),
+                const SizedBox(height: 3),
+                Text(
+                  body,
+                  style: t.textTheme.bodyMedium?.copyWith(
+                    fontSize: 13,
+                  ),
+                ),
               ],
             ),
           ),

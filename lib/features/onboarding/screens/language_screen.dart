@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_radius.dart';
+import '../../../core/widgets/kavach_button.dart';
 import '../../../core/widgets/kavach_scaffold.dart';
 import '../onboarding_controller.dart';
 import '../onboarding_strings.dart';
@@ -17,7 +18,7 @@ class LanguageScreen extends ConsumerWidget {
     final OnboardingStrings s = ref.watch(onboardingStringsProvider);
     final OnboardingState state = ref.watch(onboardingControllerProvider);
     final OnboardingController ctrl =
-    ref.read(onboardingControllerProvider.notifier);
+        ref.read(onboardingControllerProvider.notifier);
     final ThemeData t = Theme.of(context);
     final L10n l10n = ref.watch(l10nProvider);
 
@@ -29,20 +30,20 @@ class LanguageScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           StepProgressBar(step: state.step),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           Text(s.langTitle, style: t.textTheme.headlineSmall),
           const SizedBox(height: 4),
           Text(s.langSubtitle, style: t.textTheme.bodyMedium),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: SupportedLanguage.all.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 2.6,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              mainAxisExtent: 68,
             ),
             itemBuilder: (BuildContext context, int i) {
               final SupportedLanguage lang = SupportedLanguage.all[i];
@@ -58,6 +59,7 @@ class LanguageScreen extends ConsumerWidget {
               !SupportedLanguage.byCode(state.langCode!).hasFullUiSupport)
             Container(
               padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
                 color: t.colorScheme.warningLikeContainer,
                 borderRadius: AppRadius.rM,
@@ -76,6 +78,16 @@ class LanguageScreen extends ConsumerWidget {
                 ],
               ),
             ),
+          if (state.langCode != null) ...<Widget>[
+            const SizedBox(height: 8),
+            KavachButton(
+              label: s.next,
+              icon: Icons.arrow_forward_rounded,
+              expand: true,
+              onPressed: () => ctrl.setLanguage(state.langCode!),
+            ),
+          ],
+          const SizedBox(height: 24),
         ],
       ),
     );

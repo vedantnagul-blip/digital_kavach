@@ -84,6 +84,7 @@ object WarnNotifier {
         val muteIntent = Intent(context, WarnActionReceiver::class.java).apply {
             action = "com.digitalkavach.app.MUTE_24H"
             putExtra("titleHash", titleHash)
+            putExtra("entryId", entryId)
         }
         val mutePending = PendingIntent.getBroadcast(
             context, ("mute_$entryId").hashCode(), muteIntent,
@@ -116,6 +117,10 @@ object WarnNotifier {
 
     private fun localizedWarning(family: String): Pair<String, String> {
         return when (family) {
+            "electricity_bill" -> Pair(
+                "🚨 SCAM: Electricity Disconnection Scam",
+                "Official electricity boards never threaten disconnection via personal WhatsApp/SMS. Do NOT call or pay."
+            )
             "digital_arrest" -> Pair(
                 "⚠️ SCAM: Digital Arrest",
                 "Suspected fake police/CBI script. Do NOT reply or share OTP."

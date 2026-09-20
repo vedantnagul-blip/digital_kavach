@@ -19,6 +19,7 @@ import '../../data/local/user_prefs.dart';
 import '../onboarding/onboarding_controller.dart';
 import '../scanner/scanner_screen.dart';
 import '../sentinel/feed/feed_screen.dart';
+import '../sentinel/queue_drainer.dart';
 import '../settings/settings_screen.dart';
 import 'home_strings.dart';
 
@@ -35,8 +36,37 @@ class HomeShell extends ConsumerStatefulWidget {
   ConsumerState<HomeShell> createState() => _HomeShellState();
 }
 
-class _HomeShellState extends ConsumerState<HomeShell> {
+class _HomeShellState extends ConsumerState<HomeShell>
+    with WidgetsBindingObserver {
   int _tab = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _drainSentinel();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _drainSentinel();
+    }
+  }
+
+  void _drainSentinel() {
+    try {
+      ref.read(queueDrainerProvider).drainAll();
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -359,16 +389,17 @@ class _HomeTab extends ConsumerWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
-
-          // Dev Rule Engine Tooling
-          KavachButton(
-            label: 'Dev · Rule Engine',
-            icon: Icons.science_rounded,
-            variant: KavachButtonVariant.outlined,
-            expand: true,
-            onPressed: () => context.push(Routes.devAi),
-          ),
+          // Dev Rule Engine Tooling (Debug Mode only)
+          if (kDebugMode) ...<Widget>[
+            const SizedBox(height: 16),
+            KavachButton(
+              label: 'Dev · Rule Engine',
+              icon: Icons.science_rounded,
+              variant: KavachButtonVariant.outlined,
+              expand: true,
+              onPressed: () => context.push(Routes.devAi),
+            ),
+          ],
         ],
       ),
     );

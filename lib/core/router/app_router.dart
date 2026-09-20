@@ -1,12 +1,21 @@
+import 'dart:convert';
+
 import 'package:digital_kavach/features/dev/feature_test_console.dart';
+import 'package:digital_kavach/features/family/pairing/pair_qr_screen.dart';
+import 'package:digital_kavach/features/family/pairing/pair_success_screen.dart';
+import 'package:digital_kavach/features/family/pairing/scan_pair_screen.dart';
 import 'package:digital_kavach/features/sentinel/feed/feed_screen.dart';
+import 'package:digital_kavach/features/sentinel/feed/widgets/feed_detail_screen.dart';
 import 'package:digital_kavach/features/sentinel/health/health_center_screen.dart';
+import 'package:digital_kavach/features/sentinel/sentinel_setup_wizard.dart';
 import 'package:digital_kavach/features/settings/dev/ai_panel_screen.dart';
 import 'package:digital_kavach/features/settings/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
 import '../../data/ai/ai_router.dart';
+import '../../data/local/hive_boxes.dart';
 import '../../data/local/user_prefs.dart';
 import '../../features/family/family_screen.dart';
 import '../../features/home/home_shell.dart';
@@ -17,6 +26,7 @@ import '../../features/scanner/dev_harness_screen.dart';
 import '../../features/scanner/models/qr_payload.dart';
 import '../../features/scanner/scan_result_screen.dart';
 import '../../features/scanner/scanner_screen.dart';
+import '../../features/sentinel/feed/feed_controller.dart';
 import '../l10n/l10n.dart';
 import '../theme/theme_provider.dart';
 import '../widgets/kavach_scaffold.dart';
@@ -31,14 +41,17 @@ class Routes {
   static const String scanResult = '/scan/result';
   static const String qrResult = '/qr-result';
   static const String feed = '/feed';
+  static const String feedDetail = '/feed/detail';
+  static const String verdict = '/verdict';
   static const String recovery = '/recovery';
   static const String family = '/family';
+  static const String familyPairQr = '/family/pair-qr';
+  static const String familyScanPair = '/family/scan-pair';
   static const String settings = '/settings';
   static const String settingsHealth = '/settings/health';
   static const String devAi = '/dev/ai';
   static const String devRules = '/dev/rules';
   static const String devTests = '/dev/tests';
-
 }
 
 /// Notifies the router when session-critical state changes:
@@ -49,14 +62,14 @@ class _RouterRefreshNotifier extends ChangeNotifier {
     _ref.listen<bool>(onboardedProvider, (_, __) => notifyListeners());
     _ref.listen<OnboardingState>(
       onboardingControllerProvider,
-          (_, __) => notifyListeners(),
+      (_, __) => notifyListeners(),
     );
   }
   final Ref _ref;
 }
 
 final Provider<GoRouter> appRouterProvider =
-Provider<GoRouter>((Ref<GoRouter> ref) {
+    Provider<GoRouter>((Ref<GoRouter> ref) {
   // Hydrate onboardedProvider from persisted UserPrefs on first read.
   final UserPrefs prefs = ref.read(userPrefsProvider);
   Future<void>.microtask(() {
@@ -102,7 +115,7 @@ Provider<GoRouter>((Ref<GoRouter> ref) {
         path: Routes.scan,
         builder: (BuildContext context, GoRouterState state) {
           final Map<String, dynamic>? extra =
-          state.extra as Map<String, dynamic>?;
+              state.extra as Map<String, dynamic>?;
           return ScannerScreen(
             initialText: extra?['sharedText'] as String?,
             initialImagePath: extra?['sharedImagePath'] as String?,
@@ -113,7 +126,7 @@ Provider<GoRouter>((Ref<GoRouter> ref) {
         path: Routes.scanResult,
         builder: (BuildContext context, GoRouterState state) {
           final Map<String, dynamic> extra =
-          state.extra as Map<String, dynamic>;
+              state.extra as Map<String, dynamic>;
           return ScanResultScreen(
             scanResult: extra['result'] as HybridScanResult,
             inputText: extra['inputText'] as String?,
@@ -126,7 +139,7 @@ Provider<GoRouter>((Ref<GoRouter> ref) {
         path: Routes.qrResult,
         builder: (BuildContext context, GoRouterState state) {
           final Map<String, dynamic>? extra =
-          state.extra as Map<String, dynamic>?;
+              state.extra as Map<String, dynamic>?;
           if (extra != null && extra.containsKey('result')) {
             return ScanResultScreen(
               scanResult: extra['result'] as HybridScanResult,
@@ -142,6 +155,35 @@ Provider<GoRouter>((Ref<GoRouter> ref) {
         path: Routes.feed,
         builder: (_, __) => const FeedScreen(),
       ),
+      GoRoute(
+        path: Routes.feedDetail,
+        builder: (BuildContext context, GoRouterState state) {
+          final FeedEntry? entry = state.extra as FeedEntry?;
+          if (entry != null) {
+            return FeedDetailScreen(entry: entry);
+          }
+          return const FeedScreen();
+        },
+      ),
+
+      // Notification Deep-link (kavach://verdict?entryId=...)
+      GoRoute(
+        path: '/verdict',
+        builder: (BuildContext context, GoRouterState state) {
+          final String? entryId = state.uri.queryParameters['entryId'];
+          if (entryId != null && Hive.isBoxOpen(HiveBoxes.feed)) {
+            final dynamic raw = Hive.box<dynamic>(HiveBoxes.feed).get(entryId);
+            if (raw != null) {
+              try {
+                final Map<String, dynamic> json =
+                    jsonDecode(raw as String) as Map<String, dynamic>;
+                return FeedDetailScreen(entry: FeedEntry.fromJson(json));
+              } catch (_) {}
+            }
+          }
+          return const FeedScreen();
+        },
+      ),
 
       // Golden Hour Recovery Copilot (Phase 08)
       GoRoute(
@@ -154,6 +196,29 @@ Provider<GoRouter>((Ref<GoRouter> ref) {
         path: Routes.family,
         builder: (_, __) => const FamilyScreen(),
       ),
+      GoRoute(
+        path: Routes.familyPairQr,
+        builder: (BuildContext context, GoRouterState state) {
+          final Map<String, dynamic>? extra =
+              state.extra as Map<String, dynamic>?;
+          return PairQrScreen(
+            pairCode: extra?['pairCode'] as String? ?? 'KAVACH',
+            familyId: extra?['familyId'] as String? ?? 'family',
+            expiresAt: (extra?['expiresAt'] as DateTime?) ??
+                DateTime.now().add(const Duration(minutes: 15)),
+            onRegenerate: () {},
+            onDone: () => context.pop(),
+          );
+        },
+      ),
+      GoRoute(
+        path: Routes.familyScanPair,
+        builder: (BuildContext context, GoRouterState state) {
+          return ScanPairScreen(
+            onJoin: (famId, code) async => true,
+          );
+        },
+      ),
 
       // Settings & Sentinel Health Center (Phase 07)
       GoRoute(
@@ -163,6 +228,10 @@ Provider<GoRouter>((Ref<GoRouter> ref) {
       GoRoute(
         path: Routes.settingsHealth,
         builder: (_, __) => const HealthCenterScreen(),
+      ),
+      GoRoute(
+        path: '/sentinel/setup',
+        builder: (_, __) => const SentinelSetupWizard(),
       ),
 
       // Developer Tools & Testing Panels (Phase 03 & 04)

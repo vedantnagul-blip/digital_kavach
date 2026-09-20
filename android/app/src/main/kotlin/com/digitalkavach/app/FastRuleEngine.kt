@@ -72,16 +72,20 @@ object FastRuleEngine {
             Regex("kbc|kaun\\s*banega\\s*crorepati", RegexOption.IGNORE_CASE)
         ),
         Rule(
-            "r_phishing_link_02", "phishing_link", 30,
-            Regex("https?://[^\\s]*\\.(xyz|top|click|link|work|live|cyou|buzz|quest|gq|tk|ml|cf|ga)(/|\\?|$|\\s)", RegexOption.IGNORE_CASE)
+            "r_fake_electricity_bill", "electricity_bill", 60,
+            Regex("electricity\\s*(bill|connection|power).{0,60}(disconnect|cut|off|pending|overdue|night)|बिजली.{0,40}(कट|बंद|काट)|वीज.{0,40}(खंडित|बिल|पुरवठा|बंद)|power.{0,20}disconnect", RegexOption.IGNORE_CASE)
+        ),
+        Rule(
+            "r_phishing_link_02", "phishing_link", 35,
+            Regex("https?://[^\\s]*\\.(xyz|top|click|link|work|live|cyou|buzz|quest|gq|tk|ml|cf|ga|site|online|cc|vip)(/|\\?|$|\\s)|bit\\.ly|tinyurl|\\.apk|wa\\.me", RegexOption.IGNORE_CASE)
         ),
         Rule(
             "r_qr_impersonation_01", "qr_impersonation", 55,
             Regex("scan\\s*to\\s*(receive|collect|get)|scan\\s*and\\s*(receive|collect)", RegexOption.IGNORE_CASE)
         ),
         Rule(
-            "r_urgency_01", "digital_arrest", 20,
-            Regex("(block|ब्लॉक|बंद|suspend).{0,40}(24\\s*hours|2\\s*hours|today\\s*only|आजच|तुरंत|आत्ता)", RegexOption.IGNORE_CASE)
+            "r_urgency_01", "digital_arrest", 25,
+            Regex("(block|ब्लॉक|बंद|suspend).{0,40}(24\\s*hours|2\\s*hours|today\\s*only|आजच|तुरंत|आत्ता|tonight|आज\\s*रात्री)", RegexOption.IGNORE_CASE)
         )
     )
 

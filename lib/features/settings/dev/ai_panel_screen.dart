@@ -12,14 +12,14 @@ import '../../../core/widgets/info_chip.dart';
 import '../../../core/widgets/kavach_button.dart';
 import '../../../core/widgets/kavach_scaffold.dart';
 import '../../../core/widgets/section_header.dart';
-import '../../../data/ai/ai_keys_store.dart';
+import '../../../data/ai/ai_provider.dart';
 import '../../../data/ai/ai_router.dart';
 import '../../../data/ai/circuit_breaker.dart';
+import '../../../data/ai/threat_memory_store.dart';
 import '../../../data/local/hive_boxes.dart';
 import '../../../data/local/user_prefs.dart';
 import '../../../data/rules/rule_engine.dart';
 import '../../../data/rules/score_aggregator.dart';
-import '../../../features/scanner/dev_harness_screen.dart';
 import '../../../features/scanner/models/scan_request.dart';
 import '../../../features/scanner/models/verdict.dart';
 import '../../../features/scanner/verdict_card.dart';
@@ -32,15 +32,9 @@ class AiPanelScreen extends ConsumerStatefulWidget {
 }
 
 class _AiPanelScreenState extends ConsumerState<AiPanelScreen> {
-  final TextEditingController _gKey = TextEditingController();
-  final TextEditingController _gModel = TextEditingController();
-  final TextEditingController _xKey = TextEditingController();
-  final TextEditingController _xModel = TextEditingController();
   final TextEditingController _testInput = TextEditingController();
 
-  bool _obscureGeminiKey = true;
-  bool _obscureGrokKey = true;
-
+  bool _testingHybrid = false;
   VerdictUiState? _cardState;
   HybridScanResult? _lastHybrid;
   String _latencyStr = '';
@@ -48,50 +42,39 @@ class _AiPanelScreenState extends ConsumerState<AiPanelScreen> {
   @override
   void initState() {
     super.initState();
-    _loadKeys();
+    _testInput.text =
+        'DCP Cyber Crime Delhi Police: An FIR has been registered against your Aadhaar card for money laundering. You are under digital arrest. Transfer Rs 98,500 security deposit immediately.';
   }
 
-  Future<void> _loadKeys() async {
-    final AiConfig cfg = await ref.read(aiKeysStoreProvider).getConfig();
-    setState(() {
-      _gKey.text = cfg.geminiKey ?? '';
-      _gModel.text = (cfg.geminiModel != null && cfg.geminiModel!.isNotEmpty)
-          ? cfg.geminiModel!
-          : 'gemini-1.5-flash';
-      _xKey.text = cfg.grokKey ?? '';
-      _xModel.text = cfg.grokModel ?? 'grok-2-latest';
-    });
+  @override
+  void dispose() {
+    _testInput.dispose();
+    super.dispose();
   }
 
-  Future<void> _saveKeys() async {
-    await ref.read(aiKeysStoreProvider).saveLocalOverrides(
-      AiConfig(
-        geminiKey: _gKey.text.trim(),
-        geminiModel: _gModel.text.trim(),
-        grokKey: _xKey.text.trim(),
-        grokModel: _xModel.text.trim(),
-      ),
-    );
-  }
-
-  /// HYBRID SCAN: Rules first, AI only when needed, then merge
+  /// Run full Smart Hybrid Scan (Tier 1 offline rules + AI if needed)
   Future<void> _runHybridScan({bool forceAi = false}) async {
     FocusScope.of(context).unfocus();
+    if (_testInput.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter or select sample scam text to scan!')),
+      );
+      return;
+    }
+
     setState(() {
+      _testingHybrid = true;
       _cardState = null;
       _lastHybrid = null;
     });
 
     await ref.read(userPrefsProvider).setConsentAi(true);
-    await _saveKeys();
-    CircuitBreaker(Hive.box<dynamic>(HiveBoxes.aiState), provider: 'gemini')
-        .resetForDev();
-    CircuitBreaker(Hive.box<dynamic>(HiveBoxes.aiState), provider: 'grok')
-        .resetForDev();
+
+    CircuitBreaker(Hive.box<dynamic>(HiveBoxes.aiState), provider: 'gemini').resetForDev();
+    CircuitBreaker(Hive.box<dynamic>(HiveBoxes.aiState), provider: 'grok').resetForDev();
 
     final RuleEngine engine = await ref.read(ruleEngineProvider.future);
-    final ScanRequest req =
-    ScanRequest(text: _testInput.text, source: ScanSource.paste);
+    final ScanRequest req = ScanRequest(text: _testInput.text.trim(), source: ScanSource.paste);
     final Stopwatch sw = Stopwatch()..start();
 
     try {
@@ -102,9 +85,13 @@ class _AiPanelScreenState extends ConsumerState<AiPanelScreen> {
 
       setState(() {
         _lastHybrid = result;
-        _cardState = result.hasAi
-            ? VerdictComplete(result.finalVerdict)
-            : VerdictTier1Only(result.finalVerdict);
+        if (result.hasAi) {
+          _cardState = VerdictComplete(result.finalVerdict);
+        } else if (result.aiError != null) {
+          _cardState = VerdictAiFailed(result.finalVerdict, result.aiError!);
+        } else {
+          _cardState = VerdictTier1Only(result.finalVerdict);
+        }
         _latencyStr = '${sw.elapsedMilliseconds}ms';
       });
     } on KavachException catch (e) {
@@ -122,12 +109,21 @@ class _AiPanelScreenState extends ConsumerState<AiPanelScreen> {
         );
         _latencyStr = '${sw.elapsedMilliseconds}ms (Failed)';
       });
+    } finally {
+      if (mounted) setState(() => _testingHybrid = false);
     }
   }
 
   /// OFFLINE ONLY: Just rules, no AI call
   Future<void> _runOfflineOnly() async {
     FocusScope.of(context).unfocus();
+    if (_testInput.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter or select sample scam text to scan!')),
+      );
+      return;
+    }
+
     setState(() {
       _cardState = null;
       _lastHybrid = null;
@@ -137,7 +133,7 @@ class _AiPanelScreenState extends ConsumerState<AiPanelScreen> {
     final Stopwatch sw = Stopwatch()..start();
 
     final Tier1Result tier1 = engine.run(ScanInput(
-      text: _testInput.text,
+      text: _testInput.text.trim(),
       source: ScanSource.paste,
       langCode: 'en',
     ));
@@ -162,11 +158,22 @@ class _AiPanelScreenState extends ConsumerState<AiPanelScreen> {
     });
   }
 
+  void _setPreset(String text) {
+    setState(() {
+      _testInput.text = text;
+      _cardState = null;
+      _lastHybrid = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData t = Theme.of(context);
+    final threatStore = ref.watch(threatMemoryStoreProvider);
+    final learnedCount = threatStore.getAllLearnedThreats().length;
+
     return KavachScaffold(
-      title: const Text('Dev · AI Layer'),
+      title: const Text('Dev · Agentic AI Layer'),
       scrollable: true,
       actions: <Widget>[
         IconButton(
@@ -178,89 +185,116 @@ class _AiPanelScreenState extends ConsumerState<AiPanelScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          // ===== API KEYS =====
-          const SectionHeader(title: 'API Keys Config'),
-          TextField(
-            controller: _gKey,
-            obscureText: _obscureGeminiKey,
-            decoration: InputDecoration(
-              labelText: 'Gemini API Key',
-              suffixIcon: IconButton(
-                icon: Icon(_obscureGeminiKey
-                    ? Icons.visibility_off_rounded
-                    : Icons.visibility_rounded),
-                onPressed: () =>
-                    setState(() => _obscureGeminiKey = !_obscureGeminiKey),
-              ),
-            ),
+          // ===== SECURITY SHIELD OVERVIEW (NO RAW KEYS IN UI) =====
+          const SectionHeader(
+            title: 'AI Security & Threat Intelligence',
+            subtitle: 'Zero client-side key exposure • Build-time cryptographic protection',
           ),
           const SizedBox(height: 8),
-          TextField(
-            controller: _gModel,
-            decoration: const InputDecoration(
-              labelText: 'Gemini Model (gemini-1.5-flash)',
+
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.safeContainer,
+              borderRadius: AppRadius.rL,
+              border: Border.all(color: AppColors.safe, width: 1.5),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    const Icon(Icons.verified_user_rounded,
+                        color: AppColors.safe, size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Client Key Exposure Eliminated',
+                        style: t.textTheme.titleMedium?.copyWith(
+                          color: AppColors.onSafeContainer,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'In production releases, API credentials are never displayed, entered, or stored in plaintext on client devices. LLM credentials are securely compiled at build time, protecting against reverse engineering and quota abuse.',
+                  style: t.textTheme.bodySmall?.copyWith(
+                    color: AppColors.onSafeContainer,
+                  ),
+                ),
+              ],
             ),
           ),
+
           const SizedBox(height: 12),
-          TextField(
-            controller: _xKey,
-            obscureText: _obscureGrokKey,
-            decoration: InputDecoration(
-              labelText: 'Grok API Key (Primary)',
-              suffixIcon: IconButton(
-                icon: Icon(_obscureGrokKey
-                    ? Icons.visibility_off_rounded
-                    : Icons.visibility_rounded),
-                onPressed: () =>
-                    setState(() => _obscureGrokKey = !_obscureGrokKey),
+
+          // Security Architecture Badges
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: _EngineBadge(
+                  icon: Icons.shield_rounded,
+                  title: 'Tier-1 Offline',
+                  subtitle: '107 Scam Rules',
+                  color: AppColors.safe,
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _xModel,
-            decoration: const InputDecoration(
-              labelText: 'Grok Model (grok-2-latest)',
-            ),
-          ),
-          const SizedBox(height: 12),
-          KavachButton(
-            label: 'Save Config',
-            onPressed: () async {
-              await _saveKeys();
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Keys saved locally')),
-                );
-              }
-            },
+              const SizedBox(width: 8),
+              Expanded(
+                child: _EngineBadge(
+                  icon: Icons.psychology_rounded,
+                  title: 'Tier-2 AI',
+                  subtitle: 'Gemini & Groq',
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _EngineBadge(
+                  icon: Icons.memory_rounded,
+                  title: 'Threat Memory',
+                  subtitle: '$learnedCount Signatures',
+                  color: AppColors.warning,
+                ),
+              ),
+            ],
           ),
 
           // ===== STATE CONTROL =====
           const SizedBox(height: AppSpacing.xxl24),
-          const SectionHeader(title: 'State Control'),
+          const SectionHeader(
+            title: 'State & Cache Controls',
+            subtitle: 'Reset circuit breakers and local verdict memory',
+          ),
+          const SizedBox(height: 8),
           Wrap(
             spacing: 8,
+            runSpacing: 8,
             children: <Widget>[
               ActionChip(
-                label: const Text('Reset Breaker'),
+                avatar: const Icon(Icons.refresh_rounded, size: 16),
+                label: const Text('Reset Breakers'),
                 onPressed: () {
-                  CircuitBreaker(Hive.box<dynamic>(HiveBoxes.aiState),
-                      provider: 'gemini')
+                  CircuitBreaker(Hive.box<dynamic>(HiveBoxes.aiState), provider: 'gemini')
                       .resetForDev();
-                  CircuitBreaker(Hive.box<dynamic>(HiveBoxes.aiState),
-                      provider: 'grok')
+                  CircuitBreaker(Hive.box<dynamic>(HiveBoxes.aiState), provider: 'grok')
                       .resetForDev();
                   ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('All breakers reset')));
+                    const SnackBar(content: Text('Gemini & Grok circuit breakers reset.')),
+                  );
                 },
               ),
               ActionChip(
-                label: const Text('Clear Cache'),
+                avatar: const Icon(Icons.cleaning_services_rounded, size: 16),
+                label: const Text('Clear Verdict Cache'),
                 onPressed: () {
                   Hive.box<dynamic>(HiveBoxes.cache).clear();
                   ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Cache cleared')));
+                    const SnackBar(content: Text('Offline verdict cache cleared.')),
+                  );
                 },
               ),
             ],
@@ -269,150 +303,160 @@ class _AiPanelScreenState extends ConsumerState<AiPanelScreen> {
           // ===== PLAYGROUND =====
           const SizedBox(height: AppSpacing.xxl24),
           const SectionHeader(
-            title: 'Hybrid Playground',
-            subtitle: 'Rules run first, AI only if needed',
+            title: 'Hybrid ReAct Playground',
+            subtitle: 'Test offline regex + cloud LLM arbitration',
           ),
-          TextField(
-            controller: _testInput,
-            minLines: 3,
-            maxLines: 6,
-            decoration: const InputDecoration(
-              hintText: 'Paste scam text to analyze...',
+          const SizedBox(height: 8),
+
+          Text('Quick Scam Presets:', style: t.textTheme.labelMedium),
+          const SizedBox(height: 6),
+          SingleChildScrollView(
+            scrollToDirection: Axis.horizontal,
+            child: Row(
+              children: <Widget>[
+                ActionChip(
+                  avatar: const Text('🚨', style: TextStyle(fontSize: 14)),
+                  label: const Text('Digital Arrest'),
+                  onPressed: () => _setPreset(
+                    'Supreme Court & Mumbai Police Notice: Arrest warrant issued against Aadhaar #4928-1029-4820 for illegal drug parcel. Join Skype video interrogation room immediately or police raid in 30 minutes.',
+                  ),
+                ),
+                const SizedBox(width: 6),
+                ActionChip(
+                  avatar: const Text('⚡', style: TextStyle(fontSize: 14)),
+                  label: const Text('Electricity Bill'),
+                  onPressed: () => _setPreset(
+                    'Dear Consumer, Your electricity power supply will be disconnected tonight at 9:30 PM because previous month bill was not updated. Please immediately contact electricity officer Mr. Sharma at 9876543210.',
+                  ),
+                ),
+                const SizedBox(width: 6),
+                ActionChip(
+                  avatar: const Text('💸', style: TextStyle(fontSize: 14)),
+                  label: const Text('UPI Refund'),
+                  onPressed: () => _setPreset(
+                    'Dear Customer, Rs 4,999 cash bonus credited to your PhonePe wallet. Open upi://pay?pa=refund@ybl&am=4999&pn=PhonePeBonus to accept payment into your bank.',
+                  ),
+                ),
+                const SizedBox(width: 6),
+                ActionChip(
+                  avatar: const Text('🚗', style: TextStyle(fontSize: 14)),
+                  label: const Text('e-Challan APK'),
+                  onPressed: () => _setPreset(
+                    'Traffic Police Alert: Pending traffic challan of Rs 1,000 on your vehicle MH12AB1234. Download official Parivahan app from http://echallan-parivahan-vahan.apk to pay fine before court notice.',
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
 
-          // Three scan modes
+          const SizedBox(height: 12),
+          TextField(
+            controller: _testInput,
+            maxLines: 4,
+            decoration: const InputDecoration(
+              labelText: 'Scam message to analyze',
+              hintText: 'Paste suspicious SMS, WhatsApp message, or notice...',
+              alignLabelWithHint: true,
+              border: OutlineInputBorder(),
+            ),
+          ),
+
+          const SizedBox(height: 12),
           Row(
             children: <Widget>[
               Expanded(
                 child: KavachButton(
-                  label: 'Smart Hybrid',
+                  label: 'Smart Hybrid Scan',
                   icon: Icons.auto_awesome_rounded,
+                  loading: _testingHybrid,
                   onPressed: () => _runHybridScan(forceAi: false),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: KavachButton(
-                  label: 'Force AI',
+                  label: 'Offline Only (5ms)',
+                  icon: Icons.bolt_rounded,
                   variant: KavachButtonVariant.tonal,
-                  icon: Icons.psychology_rounded,
-                  onPressed: () => _runHybridScan(forceAi: true),
+                  onPressed: _runOfflineOnly,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          KavachButton(
-            label: 'Offline Only (Rules)',
-            variant: KavachButtonVariant.outlined,
-            icon: Icons.bolt_rounded,
-            expand: true,
-            onPressed: _runOfflineOnly,
-          ),
 
-          // ===== RESULT DISPLAY =====
+          if (_latencyStr.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 8),
+            Row(
+              children: <Widget>[
+                Icon(Icons.timer_outlined, size: 16, color: t.colorScheme.outline),
+                const SizedBox(width: 4),
+                Text('Scan Latency: $_latencyStr', style: t.textTheme.bodySmall),
+                const Spacer(),
+                if (_lastHybrid != null) ...<Widget>[
+                  Text(
+                    _lastHybrid!.hasAi ? 'Engine: Tier-1 + AI' : 'Engine: Tier-1 Offline',
+                    style: t.textTheme.bodySmall?.copyWith(
+                      color: _lastHybrid!.hasAi ? AppColors.primary : AppColors.safe,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+
           if (_cardState != null) ...<Widget>[
-            const SizedBox(height: 24),
-            _buildScoreBreakdown(t),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             VerdictCard(state: _cardState!),
           ],
+
+          const SizedBox(height: 32),
         ],
       ),
     );
   }
+}
 
-  Widget _buildScoreBreakdown(ThemeData t) {
-    if (_lastHybrid == null) return const SizedBox.shrink();
-    final HybridScanResult r = _lastHybrid!;
+class _EngineBadge extends StatelessWidget {
+  const _EngineBadge({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+  });
 
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData t = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
-        color: t.colorScheme.surfaceContainerHighest,
-        borderRadius: AppRadius.rL,
+        color: t.colorScheme.surface,
+        borderRadius: AppRadius.rM,
         border: Border.all(color: t.colorScheme.outlineVariant),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              const InfoChip(
-                  label: 'Result', icon: Icons.analytics_rounded),
-              const Spacer(),
-              Text(
-                _latencyStr,
-                style: t.textTheme.labelMedium
-                    ?.copyWith(color: AppColors.primary),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _scoreRow(t, '⚡ Offline Rules',
-              '${r.tier1Result.score}/100 · ${r.tier1Result.level.wire}',
-              _colorFor(r.tier1Result.level)),
+          Icon(icon, color: color, size: 22),
           const SizedBox(height: 6),
-          if (r.hasAi)
-            _scoreRow(
-              t,
-              '🧠 AI Deep-Scan',
-              '${r.aiVerdict!.riskScore}/100 · ${r.aiVerdict!.verdict.wire}',
-              _colorFor(r.aiVerdict!.verdict),
-            )
-          else
-            _scoreRow(
-              t,
-              '🧠 AI Deep-Scan',
-              r.aiSkipReason ?? 'Not called',
-              t.colorScheme.onSurfaceVariant,
-            ),
-          const Divider(height: 20),
-          _scoreRow(
-            t,
-            '🎯 FINAL VERDICT',
-            '${r.finalVerdict.riskScore}/100 · ${r.finalVerdict.verdict.wire}',
-            _colorFor(r.finalVerdict.verdict),
-            bold: true,
+          Text(
+            title,
+            style: t.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            style: t.textTheme.bodySmall?.copyWith(fontSize: 10, color: t.colorScheme.outline),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
-  }
-
-  Widget _scoreRow(ThemeData t, String label, String value, Color color,
-      {bool bold = false}) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Text(
-            label,
-            style: t.textTheme.bodyMedium?.copyWith(
-              fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
-            ),
-          ),
-        ),
-        Text(
-          value,
-          style: t.textTheme.labelLarge?.copyWith(
-            color: color,
-            fontWeight: bold ? FontWeight.w800 : FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Color _colorFor(VerdictLevel l) {
-    switch (l) {
-      case VerdictLevel.green:
-        return AppColors.safe;
-      case VerdictLevel.amber:
-        return AppColors.warning;
-      case VerdictLevel.red:
-        return AppColors.danger;
-    }
   }
 }

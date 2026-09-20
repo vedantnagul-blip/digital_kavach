@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/empty_state_view.dart';
 import '../../../core/widgets/loading_view.dart';
+import '../queue_drainer.dart';
 import 'feed_controller.dart';
 import 'widgets/feed_detail_screen.dart';
 import 'widgets/feed_filter_bar.dart';
@@ -63,40 +64,53 @@ class FeedScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.s8),
           Expanded(
-            child: state.isLoading
-                ? const Center(child: LoadingView())
-                : state.filteredEntries.isEmpty
-                ? const EmptyStateView(
-              icon: Icons.check_circle_outline_rounded,
-              title: 'Koi dhoka nahi mila',
-              message: 'Sab surakshit hai! All clear.',
-            )
-                : ListView.builder(
-              itemCount: state.filteredEntries.length,
-              itemBuilder: (context, index) {
-                final entry = state.filteredEntries[index];
-                return FeedListItem(
-                  entry: entry,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => FeedDetailScreen(entry: entry),
-                    ),
-                  ),
-                  onDismiss: () {
-                    controller.dismissEntry(entry.id);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Item dismissed'),
-                        action: SnackBarAction(
-                          label: 'UNDO',
-                          onPressed: controller.undoDismiss,
-                        ),
-                      ),
-                    );
-                  },
-                );
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await ref.read(queueDrainerProvider).drainAll();
+                controller.loadEntries();
               },
+              child: state.isLoading
+                  ? const Center(child: LoadingView())
+                  : state.filteredEntries.isEmpty
+                      ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: const [
+                            SizedBox(height: 80),
+                            EmptyStateView(
+                              icon: Icons.check_circle_outline_rounded,
+                              title: 'Koi dhoka nahi mila',
+                              message: 'Sab surakshit hai! All clear.',
+                            ),
+                          ],
+                        )
+                      : ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: state.filteredEntries.length,
+                          itemBuilder: (context, index) {
+                            final entry = state.filteredEntries[index];
+                            return FeedListItem(
+                              entry: entry,
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => FeedDetailScreen(entry: entry),
+                                ),
+                              ),
+                              onDismiss: () {
+                                controller.dismissEntry(entry.id);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text('Item dismissed'),
+                                    action: SnackBarAction(
+                                      label: 'UNDO',
+                                      onPressed: controller.undoDismiss,
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
             ),
           ),
         ],

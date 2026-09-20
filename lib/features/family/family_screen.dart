@@ -113,7 +113,28 @@ class FamilyScreen extends ConsumerWidget {
               variant: KavachButtonVariant.tonal,
               icon: Icons.person_add,
               expand: true,
-              onPressed: () => controller.generatePairCode(),
+              onPressed: () async {
+                await controller.generatePairCode();
+                final updated = ref.read(familyControllerProvider);
+                if (context.mounted && updated.activePairCode != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PairQrScreen(
+                        pairCode: updated.activePairCode!,
+                        familyId: updated.activePairFamilyId!,
+                        expiresAt: updated.pairCodeExpiry ??
+                            DateTime.now().add(const Duration(minutes: 15)),
+                        onRegenerate: () => controller.generatePairCode(),
+                        onDone: () {
+                          Navigator.pop(context);
+                          controller.loadFamily();
+                        },
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
             const SizedBox(height: AppSpacing.xxl24),
 

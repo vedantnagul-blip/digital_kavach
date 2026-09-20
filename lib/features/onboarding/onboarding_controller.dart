@@ -184,13 +184,20 @@ class OnboardingController extends Notifier<OnboardingState> {
     AppLogger.i('Onboarding: completeAll — user is now onboarded');
   }
 
-  bool get canGoBack => state.step == OnboardingStep.mode;
+  bool get canGoBack =>
+      state.step != OnboardingStep.language &&
+      state.step != OnboardingStep.done;
 
   void back() {
-    if (!canGoBack) return;
     switch (state.step) {
       case OnboardingStep.mode:
         state = state.copyWith(step: OnboardingStep.language);
+      case OnboardingStep.signIn:
+        state = state.copyWith(step: OnboardingStep.mode);
+      case OnboardingStep.consent:
+        state = state.copyWith(step: OnboardingStep.signIn);
+      case OnboardingStep.sentinelSetup:
+        state = state.copyWith(step: OnboardingStep.consent);
       default:
         break;
     }

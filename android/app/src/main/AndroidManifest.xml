@@ -80,10 +80,15 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
+        <!-- Google ML Kit OCR Model download (Latin + Devanagari for Hindi/Marathi) -->
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="ocr,ocr_devanagari" />
+
         <!-- SENTINEL: NotificationListenerService -->
         <service
             android:name=".KavachSentinelService"
-            android:exported="false"
+            android:exported="true"
             android:label="Kavach Sentinel"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
             android:foregroundServiceType="specialUse">

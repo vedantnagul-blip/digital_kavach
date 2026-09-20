@@ -1,8 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/errors/kavach_exception.dart';
+
+final Provider<UserRepo> userRepoProvider = Provider<UserRepo>(
+  (Ref ref) => UserRepo(FirebaseFirestore.instance),
+);
 
 /// App-level user identity — decoupled from Firebase SDK types so the rest
 /// of the app doesn't import `firebase_auth`.

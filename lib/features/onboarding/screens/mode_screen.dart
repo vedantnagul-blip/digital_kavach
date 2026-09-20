@@ -16,16 +16,18 @@ class ModeScreen extends ConsumerWidget {
     final OnboardingStrings s = ref.watch(onboardingStringsProvider);
     final OnboardingState state = ref.watch(onboardingControllerProvider);
     final OnboardingController ctrl =
-    ref.read(onboardingControllerProvider.notifier);
+        ref.read(onboardingControllerProvider.notifier);
     final ThemeData t = Theme.of(context);
+
+    final selectedMode = state.modeCode ?? 'standard';
 
     return KavachScaffold(
       title: Text(s.modeTitle),
       leading: ctrl.canGoBack
           ? IconButton(
-        icon: const Icon(Icons.arrow_back_rounded),
-        onPressed: ctrl.back,
-      )
+              icon: const Icon(Icons.arrow_back_rounded),
+              onPressed: ctrl.back,
+            )
           : null,
       scrollable: true,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -42,27 +44,27 @@ class ModeScreen extends ConsumerWidget {
             previewText: s.modePreviewSample,
             textScale: 1.0,
             buttonHeight: 44,
-            selected: state.modeCode == 'standard',
+            selected: selectedMode == 'standard',
             onTap: () => ctrl.setMode('standard'),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           ModePreviewCard(
             title: s.modeElderTitle,
             bullets: s.modeElderBullets,
             previewText: s.modePreviewSample,
-            textScale: 1.4,
-            buttonHeight: 60,
-            selected: state.modeCode == 'elder',
+            textScale: 1.35,
+            buttonHeight: 56,
+            selected: selectedMode == 'elder',
             onTap: () => ctrl.setMode('elder'),
           ),
           const SizedBox(height: 24),
-          if (state.modeCode != null)
-            KavachButton(
-              label: s.next,
-              icon: Icons.arrow_forward_rounded,
-              expand: true,
-              onPressed: () => ctrl.setMode(state.modeCode!),
-            ),
+          KavachButton(
+            label: s.next,
+            icon: Icons.arrow_forward_rounded,
+            expand: true,
+            onPressed: () => ctrl.setMode(selectedMode),
+          ),
+          const SizedBox(height: 24),
         ],
       ),
     );

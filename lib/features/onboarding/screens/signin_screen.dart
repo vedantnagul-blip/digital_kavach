@@ -14,7 +14,7 @@ import '../onboarding_strings.dart';
 import '../widgets/step_progress_bar.dart';
 
 final Provider<AuthRepo> authRepoProvider =
-Provider<AuthRepo>((Ref<AuthRepo> ref) => AuthRepo());
+    Provider<AuthRepo>((Ref<AuthRepo> ref) => AuthRepo());
 
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
@@ -39,7 +39,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       if (!mounted) return;
       if (user == null) {
         setState(() =>
-        _infoMessage = ref.read(onboardingStringsProvider).signInCancelled);
+            _infoMessage = ref.read(onboardingStringsProvider).signInCancelled);
         return;
       }
       await ref
@@ -75,12 +75,21 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   Widget build(BuildContext context) {
     final OnboardingStrings s = ref.watch(onboardingStringsProvider);
     final OnboardingState state = ref.watch(onboardingControllerProvider);
+    final OnboardingController ctrl =
+        ref.read(onboardingControllerProvider.notifier);
     final ThemeData t = Theme.of(context);
     final L10n l10n = ref.watch(l10nProvider);
 
     if (_error != null) {
       return KavachScaffold(
         title: Text(l10n.strings.appName),
+        leading: ctrl.canGoBack
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_rounded),
+                onPressed: ctrl.back,
+              )
+            : null,
+        scrollable: true,
         body: ErrorStateView(
           error: _error!,
           onRetry: () => setState(() => _error = null),
@@ -90,20 +99,26 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
     return KavachScaffold(
       title: Text(l10n.strings.appName),
+      leading: ctrl.canGoBack
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              onPressed: ctrl.back,
+            )
+          : null,
       scrollable: true,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           StepProgressBar(step: state.step),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
           Icon(Icons.verified_user_rounded,
-              size: 56, color: t.colorScheme.primary),
+              size: 48, color: t.colorScheme.primary),
           const SizedBox(height: 16),
           Text(s.signInTitle, style: t.textTheme.headlineSmall),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(s.signInSubtitle, style: t.textTheme.bodyMedium),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
           KavachButton(
             label: s.signInGoogle,
             icon: Icons.g_mobiledata_rounded,
@@ -119,7 +134,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             expand: true,
             onPressed: _loadingGoogle ? null : _signInGuest,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -133,8 +148,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     size: 18, color: t.colorScheme.onSurfaceVariant),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(s.signInGuestNote,
-                      style: t.textTheme.bodySmall),
+                  child: Text(
+                    s.signInGuestNote,
+                    style: t.textTheme.bodySmall,
+                  ),
                 ),
               ],
             ),
@@ -143,10 +160,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             const SizedBox(height: 12),
             Text(
               _infoMessage!,
-              style: t.textTheme.bodyMedium
-                  ?.copyWith(color: t.colorScheme.error),
+              style: t.textTheme.bodyMedium?.copyWith(
+                color: t.colorScheme.error,
+              ),
             ),
           ],
+          const SizedBox(height: 32),
         ],
       ),
     );

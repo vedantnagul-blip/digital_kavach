@@ -124,6 +124,7 @@ class KavachSentinelService : NotificationListenerService() {
         if (messages.isEmpty()) return
 
         for ((line, ts) in messages) {
+            Log.d(TAG, "Notification line extracted from $pkg ($title): $line")
             processLine(pkg, title, line, ts)
         }
     }
@@ -133,12 +134,16 @@ class KavachSentinelService : NotificationListenerService() {
         if (trimmed.length < 5) return
 
         val dedupKey = DedupStore.computeKey(pkg, title, trimmed, ts)
-        if (DedupStore.seen(this, dedupKey)) return
+        if (DedupStore.seen(this, dedupKey)) {
+            Log.d(TAG, "Dedup: message already scanned recently, skipping")
+            return
+        }
 
         val redThreshold = SentinelPrefs.getRedThreshold(this)
         val amberThreshold = SentinelPrefs.getAmberThreshold(this)
 
         val result = FastRuleEngine.evaluate(trimmed)
+        Log.i(TAG, "FastRuleEngine scan: score=${result.score}, family=${result.topFamily}, hits=${result.hits.size}")
         if (result.score < amberThreshold) return  // Drop entirely
 
         val topRule = result.hits.maxByOrNull { it.weight }
@@ -151,8 +156,10 @@ class KavachSentinelService : NotificationListenerService() {
             family = result.topFamily,
             ruleId = topRule?.ruleId ?: "unknown"
         )
+        Log.i(TAG, "Enqueued Sentinel threat entry: $entryId")
 
         if (result.score >= redThreshold) {
+            Log.i(TAG, "Triggering heads-up warning notification for $entryId")
             WarnNotifier.postWarning(this, entryId, title, result.topFamily, result.score)
         }
     }

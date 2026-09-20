@@ -19,6 +19,11 @@ class WarnActionReceiver : BroadcastReceiver() {
             "com.digitalkavach.app.MUTE_24H" -> {
                 val titleHash = intent.getStringExtra("titleHash") ?: return
                 SentinelPrefs.muteTitle(context, titleHash, 24 * 60 * 60 * 1000L)
+                val entryId = intent.getStringExtra("entryId")
+                if (entryId != null) {
+                    val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    nm.cancel(entryId.hashCode())
+                }
             }
         }
     }

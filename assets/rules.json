@@ -523,7 +523,7 @@
       "id": "r_investment_02",
       "family": "investment_group",
       "type": "regex",
-      "pattern": "share\\s*tips|stock\\s*tips|jackpot\\s*call|sure\\s*shot|intraday\\s*calls|f\\&o\\s*tips",
+      "pattern": "share\\s*tips|stock\\s*tips|jackpot\\s*call|sure\\s*shot|intraday\\s*calls|f&o\\s*tips",
       "flags": "i",
       "weight": 30,
       "localizedHint": {

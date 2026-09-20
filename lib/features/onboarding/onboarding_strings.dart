@@ -95,13 +95,17 @@ class OnboardingStrings {
   final String sentinelStepPostNotif;
   final String sentinelLater;
   final String sentinelLockedNote;
+  final String sentinelActionGrant;
+  final String sentinelActionGranted;
+  final String sentinelActive;
+  final String sentinelEnable;
 
   static const OnboardingStrings en = OnboardingStrings(
     progressLabel: 'Step',
     next: 'Continue',
     back: 'Back',
-    skip: 'Skip',
-    finish: 'Finish',
+    skip: 'Skip for now',
+    finish: 'Complete Setup',
     langTitle: 'Choose your language',
     langSubtitle: 'You can change this later in Settings.',
     langComingSoonNote:
@@ -147,21 +151,25 @@ class OnboardingStrings {
     consentFooter:
     'You can change this any time in Settings. AI opinion — final decision is yours.',
     sentinelTitle: 'Turn on Kavach Sentinel',
-    sentinelSubtitle: 'Automatic protection while your phone stays locked.',
+    sentinelSubtitle: 'Real-time automatic protection while your phone stays locked.',
     sentinelStepNotifAccess: 'Notification Access',
     sentinelStepBattery: 'Battery-saver exemption',
-    sentinelStepPostNotif: 'Show warnings on lock screen',
-    sentinelLater: 'Set up later',
+    sentinelStepPostNotif: 'Enable background protection',
+    sentinelLater: 'Skip for now',
     sentinelLockedNote:
-    'Setup wizard available in the next app update. You can enable it any time from Settings → Sentinel.',
+    'You can adjust notification permissions or battery saver settings anytime from Settings → Sentinel Health Center.',
+    sentinelActionGrant: 'Grant Permission',
+    sentinelActionGranted: 'Granted ✓',
+    sentinelActive: 'Active ✓',
+    sentinelEnable: 'Enable Now',
   );
 
   static const OnboardingStrings hi = OnboardingStrings(
     progressLabel: 'चरण',
     next: 'आगे बढ़ें',
     back: 'वापस',
-    skip: 'छोड़ें',
-    finish: 'पूरा करें',
+    skip: 'अभी छोड़ें',
+    finish: 'सेटअप पूरा करें',
     langTitle: 'अपनी भाषा चुनें',
     langSubtitle: 'बाद में सेटिंग्स में बदल सकते हैं।',
     langComingSoonNote:
@@ -207,21 +215,25 @@ class OnboardingStrings {
     consentFooter:
     'सेटिंग्स में कभी भी बदल सकते हैं। AI की राय — अंतिम निर्णय आपका।',
     sentinelTitle: 'Kavach Sentinel चालू करें',
-    sentinelSubtitle: 'फ़ोन बंद हो तब भी अपने-आप सुरक्षा।',
+    sentinelSubtitle: 'फ़ोन बंद हो तब भी 24x7 अपने-आप सुरक्षा।',
     sentinelStepNotifAccess: 'Notification Access',
     sentinelStepBattery: 'बैटरी-सेवर से छूट',
-    sentinelStepPostNotif: 'लॉक स्क्रीन पर चेतावनी दिखाएँ',
-    sentinelLater: 'बाद में सेट-अप करें',
+    sentinelStepPostNotif: 'बैकग्राउंड सुरक्षा सक्षम करें',
+    sentinelLater: 'अभी छोड़ें',
     sentinelLockedNote:
-    'सेटअप विज़ार्ड अगले ऐप अपडेट में। सेटिंग्स → Sentinel से कभी भी चालू कर सकते हैं।',
+    'सेटिंग्स → Sentinel Health Center से आप कभी भी अनुमतियाँ बदल सकते हैं।',
+    sentinelActionGrant: 'अनुमति दें',
+    sentinelActionGranted: 'स्वीकृत ✓',
+    sentinelActive: 'सक्रिय ✓',
+    sentinelEnable: 'सक्रिय करें',
   );
 
   static const OnboardingStrings mr = OnboardingStrings(
     progressLabel: 'पायरी',
     next: 'पुढे',
     back: 'मागे',
-    skip: 'वगळा',
-    finish: 'पूर्ण करा',
+    skip: 'आत्ता वगळा',
+    finish: 'सेटअप पूर्ण करा',
     langTitle: 'तुमची भाषा निवडा',
     langSubtitle: 'नंतर सेटिंग्जमध्ये बदलू शकता.',
     langComingSoonNote:
@@ -251,28 +263,32 @@ class OnboardingStrings {
     consentSubtitle: 'सोपी भाषा — छुप्या अटी नाहीत.',
     consentReadTitle: 'आम्ही काय वाचतो',
     consentReadBody:
-    'فक्त तुम्ही निवडलेल्या अ‍ॅप्सचे notifications (WhatsApp, SMS, Telegram). कधीही call log किंवा contacts नाही.',
+    'फक्त तुम्ही निवडलेल्या अ‍ॅप्सचे notifications (WhatsApp, SMS, Telegram). कधीही call log किंवा contacts नाही.',
     consentLocalTitle: 'फोनमध्ये काय राहते',
     consentLocalBody:
     'सर्व तपासणी आधी तुमच्या फोनवरच होते. सुरक्षित संदेश कधीच बाहेर जात नाहीत.',
     consentLeavesTitle: 'फोनमधून काय जाते',
     consentLeavesBody:
-    'فक्त धोकादायक वाटलेले संदेश — तुमच्या परवानगीने AI (Gemini) कडे पाठवले जातात.',
+    'फक्त धोकादायक वाटलेले संदेश — तुमच्या परवानगीने AI (Gemini) कडे पाठवले जातात.',
     consentStorageTitle: 'आम्ही काय साठवतो',
     consentStorageBody:
-    'فक्त निकालाचा छोटा fingerprint (hash) — मूळ संदेश कधीच नाही.',
+    'फक्त निकालाचा छोटा fingerprint (hash) — मूळ संदेश कधीच नाही.',
     consentAllow: 'AI डीप-स्कॅन ला परवानगी द्या',
-    consentOfflineOnly: 'فक्त ऑफलाइन तपासणी',
+    consentOfflineOnly: 'फक्त ऑफलाइन तपासणी',
     consentFooter:
     'सेटिंग्जमध्ये कधीही बदलू शकता. AI चे मत — अंतिम निर्णय तुमचा.',
     sentinelTitle: 'Kavach Sentinel चालू करा',
-    sentinelSubtitle: 'फोन लॉक असतानाही आपोआप संरक्षण.',
+    sentinelSubtitle: 'फोन लॉक असतानाही 24x7 आपोआप संरक्षण.',
     sentinelStepNotifAccess: 'Notification Access',
     sentinelStepBattery: 'बॅटरी-सेव्हर सूट',
-    sentinelStepPostNotif: 'लॉक स्क्रीनवर इशारे दाखवा',
-    sentinelLater: 'नंतर सेट-अप करा',
+    sentinelStepPostNotif: 'पार्श्वभूमी संरक्षण सुरू करा',
+    sentinelLater: 'आत्ता वगळा',
     sentinelLockedNote:
-    'सेटअप विझार्ड पुढच्या अ‍ॅप अपडेटमध्ये. सेटिंग्ज → Sentinel वरून कधीही सुरू करू शकता.',
+    'सेटिंग्ज → Sentinel Health Center वरून तुम्ही कधीही परवानग्या व्यवस्थापित करू शकता.',
+    sentinelActionGrant: 'परवानगी द्या',
+    sentinelActionGranted: 'मंजूर ✓',
+    sentinelActive: 'सक्रिय ✓',
+    sentinelEnable: 'सुरू करा',
   );
 
   /// Resolves the OnboardingStrings instance for the chosen locale.

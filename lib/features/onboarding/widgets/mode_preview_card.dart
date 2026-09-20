@@ -27,9 +27,9 @@ class ModePreviewCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData t = Theme.of(context);
     final Color border =
-    selected ? t.colorScheme.primary : t.colorScheme.outlineVariant;
+        selected ? t.colorScheme.primary : t.colorScheme.outlineVariant;
     final Color bg =
-    selected ? t.colorScheme.primaryContainer : t.colorScheme.surface;
+        selected ? t.colorScheme.primaryContainer.withOpacity(0.3) : t.colorScheme.surface;
 
     return Semantics(
       button: true,
@@ -46,24 +46,32 @@ class ModePreviewCard extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               borderRadius: AppRadius.rXl,
-              border: Border.all(color: border, width: selected ? 2 : 1),
+              border: Border.all(
+                color: border,
+                width: selected ? 2.5 : 1,
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Row(
                   children: <Widget>[
                     Expanded(
                       child: Text(
                         title,
-                        style: t.textTheme.titleLarge?.copyWith(
+                        style: t.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w800,
+                          fontSize: 18,
                         ),
                       ),
                     ),
                     if (selected)
-                      Icon(Icons.check_circle_rounded,
-                          color: t.colorScheme.primary),
+                      Icon(
+                        Icons.check_circle_rounded,
+                        color: t.colorScheme.primary,
+                        size: 24,
+                      ),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -73,6 +81,7 @@ class ModePreviewCard extends StatelessWidget {
                     textScaler: TextScaler.linear(textScale),
                   ),
                   child: Container(
+                    width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       borderRadius: AppRadius.rM,
@@ -80,16 +89,18 @@ class ModePreviewCard extends StatelessWidget {
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         Text(
                           previewText,
-                          style: t.textTheme.bodyLarge?.copyWith(
+                          style: t.textTheme.bodyMedium?.copyWith(
                             color: t.colorScheme.onSurface,
                           ),
                         ),
                         const SizedBox(height: 10),
                         Container(
-                          height: buttonHeight,
+                          constraints: BoxConstraints(minHeight: buttonHeight),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: t.colorScheme.primary,
@@ -109,16 +120,25 @@ class ModePreviewCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 ...bullets.map(
-                      (String b) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
+                  (String b) => Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Icon(Icons.check_rounded,
-                            size: 16, color: t.colorScheme.primary),
-                        const SizedBox(width: 6),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Icon(
+                            Icons.check_circle_outline_rounded,
+                            size: 16,
+                            color: t.colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
                         Expanded(
-                          child: Text(b, style: t.textTheme.bodyMedium),
+                          child: Text(
+                            b,
+                            style: t.textTheme.bodySmall?.copyWith(fontSize: 13),
+                          ),
                         ),
                       ],
                     ),
