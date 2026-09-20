@@ -39,26 +39,36 @@ class AiKeysStore {
     String? localGModel = _prefs.get('dev_mod_gemini') as String?;
     final String? localGrModel = _prefs.get('dev_mod_grok') as String?;
 
-    if (localGModel == 'gemini-2.5-flash-lite' || localGModel == null || localGModel.isEmpty) {
+    if (localGModel == null ||
+        localGModel.isEmpty ||
+        localGModel == 'gemini-3.6-flash' ||
+        localGModel == 'gemini-2.5-flash-lite') {
       localGModel = 'gemini-1.5-flash';
     }
 
-    if (localGemini != null && localGemini.trim().isNotEmpty) {
+    final bool hasLocalGemini = localGemini != null && localGemini.trim().isNotEmpty;
+    final bool hasLocalGrok = localGrok != null && localGrok.trim().isNotEmpty;
+
+    if (hasLocalGemini || hasLocalGrok) {
       return AiConfig(
-        geminiKey: localGemini.trim(),
-        grokKey: (localGrok != null && localGrok.trim().isNotEmpty) ? localGrok.trim() : null,
+        geminiKey: hasLocalGemini ? localGemini!.trim() : (ApiKeys.gemini.trim().isNotEmpty ? ApiKeys.gemini.trim() : null),
+        grokKey: hasLocalGrok ? localGrok!.trim() : (ApiKeys.grok.trim().isNotEmpty ? ApiKeys.grok.trim() : null),
         geminiModel: localGModel,
-        grokModel: localGrModel ?? 'grok-beta',
+        grokModel: (localGrModel != null && localGrModel.isNotEmpty && localGrModel != 'grok-beta') ? localGrModel : 'grok-2-latest',
       );
     }
 
     // 2. ApiKeys constants file (lib/core/utils/api_keys.dart)
-    if (ApiKeys.gemini.trim().isNotEmpty) {
+    final String groqOrGrok = ApiKeys.groq.trim().isNotEmpty
+        ? ApiKeys.groq.trim()
+        : ApiKeys.grok.trim();
+
+    if (ApiKeys.gemini.trim().isNotEmpty || groqOrGrok.isNotEmpty) {
       return AiConfig(
-        geminiKey: ApiKeys.gemini.trim(),
-        grokKey: ApiKeys.grok.trim().isNotEmpty ? ApiKeys.grok.trim() : null,
+        geminiKey: ApiKeys.gemini.trim().isNotEmpty ? ApiKeys.gemini.trim() : null,
+        grokKey: groqOrGrok.isNotEmpty ? groqOrGrok : null,
         geminiModel: ApiKeys.geminiModel.isNotEmpty ? ApiKeys.geminiModel : 'gemini-1.5-flash',
-        grokModel: ApiKeys.grokModel.isNotEmpty ? ApiKeys.grokModel : 'grok-beta',
+        grokModel: ApiKeys.grokModel.isNotEmpty ? ApiKeys.grokModel : 'llama-3.3-70b-versatile',
       );
     }
 
@@ -71,8 +81,8 @@ class AiKeysStore {
       return AiConfig(
         geminiKey: data['gemini'] as String?,
         grokKey: data['grok'] as String?,
-        geminiModel: data['gemini_model'] as String? ?? 'gemini-1.5-flash',
-        grokModel: data['grok_model'] as String? ?? 'grok-beta',
+        geminiModel: data['gemini_model'] as String? ?? 'gemini-3.6-flash',
+        grokModel: data['grok_model'] as String? ?? 'grok-2-latest',
       );
     });
   }

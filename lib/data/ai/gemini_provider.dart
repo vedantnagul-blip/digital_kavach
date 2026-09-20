@@ -14,9 +14,9 @@ import 'verdict_parser.dart';
 
 class GeminiProvider implements AiProviderClient {
   GeminiProvider({required this.apiKey, String? modelId})
-      : _preferredModel = (modelId != null && modelId.isNotEmpty)
-      ? modelId
-      : 'gemini-1.5-flash',
+      : _preferredModel = (modelId != null && modelId.isNotEmpty && modelId != 'gemini-3.6-flash')
+            ? modelId
+            : 'gemini-1.5-flash',
         supportsVision = true;
 
   @override
@@ -31,13 +31,15 @@ class GeminiProvider implements AiProviderClient {
   @override
   Future<Verdict> analyze(ScanRequest req) async {
     return runCatching(() async {
-      // List of candidate models to try automatically in sequence
+      // List of candidate models to try automatically in sequence.
+      // gemini-1.5-flash and gemini-2.0-flash have the highest free-tier quotas (1500 req/day).
       final List<String> modelsToTry = <String>{
         _preferredModel,
         'gemini-1.5-flash',
-        'gemini-1.5-pro',
         'gemini-2.0-flash',
-        'gemini-1.0-pro',
+        'gemini-1.5-flash-8b',
+        'gemini-2.5-flash',
+        'gemini-1.5-pro',
       }.toList();
 
       GenerativeAIException? lastAIException;
@@ -51,7 +53,8 @@ class GeminiProvider implements AiProviderClient {
             apiKey: apiKey,
             generationConfig: GenerationConfig(
               responseMimeType: 'application/json',
-              temperature: 0.2,
+              temperature: 0.1,
+              maxOutputTokens: 600,
             ),
             systemInstruction: Content.system(PromptBuilder.build(req).system),
           );
@@ -83,15 +86,26 @@ class GeminiProvider implements AiProviderClient {
           lastAIException = e;
           final String errStr = e.toString().toLowerCase();
 
-          // If key is invalid or quota exceeded, stop trying other models with same bad key
-          if (errStr.contains('429')) throw const QuotaExceededException();
-          if (errStr.contains('403') || errStr.contains('401')) {
+          // If key is invalid (401/403), stop trying
+          if (errStr.contains('403') || errStr.contains('401') || errStr.contains('api_key_invalid')) {
             throw const AiProviderException('gemini', 'Invalid API key from AI Studio');
           }
 
-          // If model is 404 / not found on this account, log and try next model in loop!
-          if (errStr.contains('not found') || errStr.contains('v1beta') || errStr.contains('404')) {
-            AppLogger.w('Model $currentModel not available on this key, trying next model...');
+          // If current model hit a quota limit, 503 high demand, 429 rate limit, or model not found:
+          // Smoothly fall back to the next available candidate model in the list!
+          if (errStr.contains('quota') ||
+              errStr.contains('503') ||
+              errStr.contains('high demand') ||
+              errStr.contains('unavailable') ||
+              errStr.contains('resource_exhausted') ||
+              errStr.contains('429') ||
+              errStr.contains('rate limit') ||
+              errStr.contains('not found') ||
+              errStr.contains('v1beta') ||
+              errStr.contains('404') ||
+              errStr.contains('deprecated') ||
+              errStr.contains('no longer available')) {
+            AppLogger.w('Model $currentModel unavailable ($errStr). Falling back to next model...');
             continue;
           }
 
@@ -106,7 +120,7 @@ class GeminiProvider implements AiProviderClient {
       // If all candidate models were rejected by Google
       throw AiProviderException(
         'gemini',
-        lastAIException?.message ?? 'No compatible Gemini model found for this key.',
+        lastAIException?.message ?? 'No compatible Gemini model available for this key.',
       );
     });
   }

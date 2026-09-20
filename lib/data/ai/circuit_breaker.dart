@@ -10,7 +10,7 @@ class CircuitBreaker {
   final String provider;
 
   static const int _maxFailures = 3;
-  static const Duration _openDuration = Duration(minutes: 10);
+  static const Duration _openDuration = Duration(minutes: 1);
 
   String get _failKey => 'circuit_${provider}_fails';
   String get _tsKey => 'circuit_${provider}_open_ts';
