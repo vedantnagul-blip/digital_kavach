@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../core/l10n/l10n.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_radius.dart';
@@ -267,24 +268,65 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
   @override
   Widget build(BuildContext context) {
     final ThemeData t = Theme.of(context);
+    final L10n l10n = ref.watch(l10nProvider);
+    final AppLocale locale = ref.watch(localeProvider);
+
+    final String pasteTabLabel = <String, String>{
+      'en': 'Paste Text',
+      'hi': 'टेक्स्ट पेस्ट करें',
+      'mr': 'मजकूर पेस्ट करा',
+      'ta': 'உரையை ஒட்டவும்',
+      'te': 'వచనాన్ని అతికించండి',
+      'bn': 'লেখা পেস্ট করুন',
+      'gu': 'લખાણ પેસ્ટ કરો',
+      'kn': 'ಪಠ್ಯವನ್ನು ಅಂಟಿಸಿ',
+      'ml': 'വാചകം ഒട്ടിക്കുക',
+      'pa': 'ਲਿਖਤ ਪੇਸਟ ਕਰੋ',
+    }[locale.code] ?? 'Paste Text';
+
+    final String imageTabLabel = <String, String>{
+      'en': 'Screenshot',
+      'hi': 'स्क्रीनशॉट',
+      'mr': 'स्क्रीनशॉट',
+      'ta': 'ஸ்கிரீன்ஷாட்',
+      'te': 'స్క్రీన్‌షాట్',
+      'bn': 'স্ক্রিনশট',
+      'gu': 'સ્ક્રીનશોટ',
+      'kn': 'ಸ್ಕ್ರೀನ್‌ಶಾಟ್',
+      'ml': 'സ്ക്രീൻഷോട്ട്',
+      'pa': 'ਸਕ੍ਰੀਨਸ਼ੌਟ',
+    }[locale.code] ?? 'Screenshot';
+
+    final String qrTabLabel = <String, String>{
+      'en': 'Live QR',
+      'hi': 'लाइव QR',
+      'mr': 'थेट QR',
+      'ta': 'நேரலை QR',
+      'te': 'లైవ్ QR',
+      'bn': 'লাইভ QR',
+      'gu': 'લાઇવ QR',
+      'kn': 'ಲೈವ್ QR',
+      'ml': 'തത്സമയ QR',
+      'pa': 'ਲਾਈਵ QR',
+    }[locale.code] ?? 'Live QR';
 
     return KavachScaffold(
-      title: const Text('Scanner Hub'),
+      title: Text(l10n.strings.navScan),
       bottomNavigationBar: TabBar(
         controller: _tabController,
         indicatorColor: t.colorScheme.primary,
         labelColor: t.colorScheme.primary,
         unselectedLabelColor: t.colorScheme.onSurfaceVariant,
-        tabs: const <Widget>[
-          Tab(icon: Icon(Icons.edit_note_rounded), text: 'Paste Text'),
-          Tab(icon: Icon(Icons.image_search_rounded), text: 'Screenshot'),
-          Tab(icon: Icon(Icons.qr_code_scanner_rounded), text: 'Live QR'),
+        tabs: <Widget>[
+          Tab(icon: const Icon(Icons.edit_note_rounded), text: pasteTabLabel),
+          Tab(icon: const Icon(Icons.image_search_rounded), text: imageTabLabel),
+          Tab(icon: const Icon(Icons.qr_code_scanner_rounded), text: qrTabLabel),
         ],
       ),
       body: TabBarView(
         controller: _tabController,
         children: <Widget>[
-          _buildPasteTab(t),
+          _buildPasteTab(t, locale),
           _buildImageTab(t),
           _buildQrTab(t),
         ],
@@ -292,7 +334,59 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
     );
   }
 
-  Widget _buildPasteTab(ThemeData t) {
+  Widget _buildPasteTab(ThemeData t, AppLocale locale) {
+    final String inspectText = <String, String>{
+      'en': 'Inspect Text',
+      'hi': 'टेक्स्ट की जाँच करें',
+      'mr': 'मजकूर तपासा',
+      'ta': 'உரையை ஆய்வு செய்',
+      'te': 'వచనాన్ని పరిశీలించండి',
+      'bn': 'লেখা পরীক্ষা করুন',
+      'gu': 'લખાણ તપાસો',
+      'kn': 'ಪಠ್ಯವನ್ನು ಪರೀಕ್ಷಿಸಿ',
+      'ml': 'വാചകം പരിശോധിക്കുക',
+      'pa': 'ਲਿਖਤ ਦੀ ਜਾਂਚ ਕਰੋ',
+    }[locale.code] ?? 'Inspect Text';
+
+    final String pasteClipboard = <String, String>{
+      'en': 'Paste Clipboard',
+      'hi': 'क्लिपबोर्ड से पेस्ट करें',
+      'mr': 'क्लिपबोर्डवरून पेस्ट करा',
+      'ta': 'நகலை ஒட்டவும்',
+      'te': 'క్లిప్‌బోర్డ్ అతికించు',
+      'bn': 'ক্লিপবোর্ড পেস্ট করুন',
+      'gu': 'ક્લિપબોર્ડ પેસ્ટ કરો',
+      'kn': 'ಕ್ಲಿಪ್‌ಬೋರ್ಡ್ ಅಂಟಿಸಿ',
+      'ml': 'ക്ലിപ്പ്ബോർഡ് ഒട്ടിക്കുക',
+      'pa': 'ਕਲਿੱਪਬੋਰਡ ਪੇਸਟ ਕਰੋ',
+    }[locale.code] ?? 'Paste Clipboard';
+
+    final String hintText = <String, String>{
+      'en': 'Paste WhatsApp message, SMS, or link here...',
+      'hi': 'WhatsApp संदेश, SMS, या लिंक यहाँ पेस्ट करें...',
+      'mr': 'येथे WhatsApp संदेश, SMS किंवा लिंक पेस्ट करा...',
+      'ta': 'WhatsApp செய்தி, SMS அல்லது இணைப்பை இங்கே ஒட்டவும்...',
+      'te': 'WhatsApp సందేశం, SMS లేదా లింక్‌ను ఇక్కడ అతికించండి...',
+      'bn': 'এখানে WhatsApp বার্তা, SMS বা লিঙ্ক পেস্ট করুন...',
+      'gu': 'અહીં WhatsApp સંદેશ, SMS અથવા લિંક પેસ્ટ કરો...',
+      'kn': 'ಇಲ್ಲಿ WhatsApp ಸಂದೇಶ, SMS ಅಥವಾ ಲಿಂಕ್ ಅಂಟಿಸಿ...',
+      'ml': 'WhatsApp സന്ദേശം, SMS അല്ലെങ്കിൽ ലിങ്ക് ഇവിടെ ഒട്ടിക്കുക...',
+      'pa': 'ਇੱਥੇ WhatsApp ਸੁਨੇਹਾ, SMS ਜਾਂ ਲਿੰਕ ਪੇਸਟ ਕਰੋ...',
+    }[locale.code] ?? 'Paste WhatsApp message, SMS, or link here...';
+
+    final String scanAction = <String, String>{
+      'en': 'Scan Text',
+      'hi': 'संदेश स्कैन करें',
+      'mr': 'संदेश तपासा',
+      'ta': 'செய்தியை ஸ்கேன் செய்',
+      'te': 'వచనాన్ని స్కాన్ చేయండి',
+      'bn': 'বার্তা স্ক্যান করুন',
+      'gu': 'સંદેશ સ્કેન કરો',
+      'kn': 'ಸಂದೇಶ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ',
+      'ml': 'സന്ദേശം സ്കാൻ ചെയ്യുക',
+      'pa': 'ਸੁਨੇਹਾ ਸਕੈਨ ਕਰੋ',
+    }[locale.code] ?? 'Scan Text';
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.l16),
       child: Column(
@@ -300,12 +394,12 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
         children: <Widget>[
           Row(
             children: <Widget>[
-              Text('Inspect Text', style: t.textTheme.titleMedium),
+              Text(inspectText, style: t.textTheme.titleMedium),
               const Spacer(),
               TextButton.icon(
                 onPressed: _pasteClipboard,
                 icon: const Icon(Icons.content_paste_rounded, size: 18),
-                label: const Text('Paste Clipboard'),
+                label: Text(pasteClipboard),
               ),
             ],
           ),
@@ -314,8 +408,8 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
             controller: _textController,
             minLines: 5,
             maxLines: 10,
-            decoration: const InputDecoration(
-              hintText: 'Paste WhatsApp message, SMS, or link here...',
+            decoration: InputDecoration(
+              hintText: hintText,
             ),
           ),
           const SizedBox(height: 8),
@@ -337,7 +431,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
           ),
           const SizedBox(height: 12),
           KavachButton(
-            label: 'Scan Text',
+            label: scanAction,
             icon: Icons.shield_rounded,
             loading: _loading,
             expand: true,

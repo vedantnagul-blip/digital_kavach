@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/local/user_prefs.dart';
 import 'strings_base.dart';
 import 'strings_bn.dart';
 import 'strings_en.dart';
@@ -83,9 +84,16 @@ class L10n {
   }
 }
 
-/// Selected locale.
+/// Selected locale — restored from user preferences.
 final StateProvider<AppLocale> localeProvider =
-StateProvider<AppLocale>((StateProviderRef<AppLocale> ref) => AppLocale.en);
+StateProvider<AppLocale>((StateProviderRef<AppLocale> ref) {
+  final UserPrefs prefs = ref.watch(userPrefsProvider);
+  final String? saved = prefs.langCode;
+  if (saved != null && saved.isNotEmpty) {
+    return AppLocale.fromCode(saved);
+  }
+  return AppLocale.en;
+});
 
 /// Derived L10n bundle.
 final Provider<L10n> l10nProvider = Provider<L10n>((Ref<L10n> ref) {

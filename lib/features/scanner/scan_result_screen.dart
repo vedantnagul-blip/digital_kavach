@@ -97,6 +97,20 @@ class _ScanResultScreenState extends ConsumerState<ScanResultScreen> {
   @override
   Widget build(BuildContext context) {
     final ThemeData t = Theme.of(context);
+    final AppLocale locale = ref.watch(localeProvider);
+
+    final String screenTitle = <String, String>{
+      'en': 'Scan Verdict',
+      'hi': 'जाँच परिणाम',
+      'mr': 'तपासणी निकाल',
+      'ta': 'ஸ்கேன் முடிவு',
+      'te': 'స్కాన్ ఫలితం',
+      'bn': 'স্ক্যান ফলাফল',
+      'gu': 'સ્કેન પરિણામ',
+      'kn': 'ಸ್ಕ್ಯಾನ್ ಫಲಿತಾಂಶ',
+      'ml': 'സ്കാൻ ഫലം',
+      'pa': 'ਸਕੈਨ ਨਤੀਜਾ',
+    }[locale.code] ?? 'Scan Verdict';
 
     final VerdictUiState cardState;
     if (_currentResult.hasAi) {
@@ -113,7 +127,7 @@ class _ScanResultScreenState extends ConsumerState<ScanResultScreen> {
     final bool hasNoKeys = _currentResult.aiError is NoProviderException;
 
     return KavachScaffold(
-      title: const Text('Scan Verdict'),
+      title: Text(screenTitle),
       scrollable: true,
       actions: <Widget>[
         IconButton(

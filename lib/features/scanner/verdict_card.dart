@@ -229,6 +229,32 @@ class _VerdictCardState extends ConsumerState<VerdictCard>
       );
     }
     if (s is VerdictAiFailed) {
+      final String shieldTitle = <String, String>{
+        'en': 'Verified by On-Device Kavach Shield',
+        'hi': 'ऑन-डिवाइस कवच शील्ड द्वारा सत्यापित',
+        'mr': 'ऑन-डिव्हाइस कवच शील्डद्वारे पडताळणी',
+        'ta': 'சாதனக் கவசத்தால் சரிபார்க்கப்பட்டது',
+        'te': 'ఆన్-డివైస్ కవచ్ షీల్డ్ ద్వారా ధృవీకరించబడింది',
+        'bn': 'অন-ডিভাইস কবচ শিল্ড দ্বারা যাচাইকৃত',
+        'gu': 'ઓન-ડિવાઇસ કવચ શિલ્ડ દ્વારા ચકાસાયેલ',
+        'kn': 'ಆನ್-ಡಿವೈಸ್ ಕವಚ ಶೀಲ್ಡ್ ಮೂಲಕ ಪರಿಶೀಲಿಸಲಾಗಿದೆ',
+        'ml': 'ഓൺ-ഡിവൈസ് കവച് ഷീൽഡ് വഴി പരിശോധിച്ചു',
+        'pa': 'ਆਨ-ਡਿਵਾਈਸ ਕਵਚ ਸ਼ੀਲਡ ਦੁਆਰਾ ਤਸਦੀਕ ਕੀਤਾ',
+      }[locale.code] ?? 'Verified by On-Device Kavach Shield';
+
+      final String shieldSub = <String, String>{
+        'en': 'Cloud AI is offline. Your verdict is 100% secured by the local offline rule engine.',
+        'hi': 'क्लाउड AI ऑफलाइन है। आपका नतीजा 100% स्थानीय ऑफलाइन नियम इंजन द्वारा सुरक्षित है।',
+        'mr': 'क्लाउड AI ऑफलाइन आहे. तुमचा निकाल 100% स्थानिक ऑफलाइन नियम इंजिनद्वारे सुरक्षित आहे.',
+        'ta': 'கிளவுட் AI ஆஃப்லைனில் உள்ளது. உங்கள் முடிவு 100% ஆஃப்லைன் என்ஜினால் பாதுகாக்கப்படுகிறது.',
+        'te': 'క్లౌడ్ AI ఆఫ్‌లైన్‌లో ఉంది. మీ ఫలితం 100% స్థానిక ఆఫ్‌లైన్ ఇంజిన్ ద్వారా సురక్షితం.',
+        'bn': 'ক্লাউড AI অফলাইনে রয়েছে। স্থানীয় নিয়ম ইঞ্জিন দ্বারা আপনার ফলাফল ১০০% সুরক্ষিত।',
+        'gu': 'ક્લાઉડ AI ઑફલાઇન છે. તમારો નિર્ણય 100% સ્થાનિક નિયમ એન્જિન દ્વારા સુરક્ષિત છે.',
+        'kn': 'ಕ್ಲೌಡ್ AI ಆಫ್‌ಲೈನ್ ಆಗಿದೆ. ನಿಮ್ಮ ಫಲಿತಾಂಶವು 100% ಸ್ಥಳೀಯ ನಿಯಮ ಎಂಜಿನ್‌ನಿಂದ ಸುರಕ್ಷಿತವಾಗಿದೆ.',
+        'ml': 'ക്ലൗഡ് AI ഓഫ്‌ലൈനിലാണ്. നിങ്ങളുടെ ഫലം 100% പ്രാദേശിക നിയമ എഞ്ചിൻ വഴി സുരക്ഷിതമാണ്.',
+        'pa': 'ਕਲਾਊਡ AI ਔਫਲਾਈਨ ਹੈ। ਤੁਹਾਡਾ ਨਤੀਜਾ 100% ਸਥਾਨਕ ਨਿਯਮ ਇੰਜਣ ਦੁਆਰਾ ਸੁਰੱਖਿਅਤ ਹੈ।',
+      }[locale.code] ?? 'Cloud AI is offline. Your verdict is 100% secured by the local offline rule engine.';
+
       return Padding(
         padding: const EdgeInsets.only(top: 12),
         child: Container(
@@ -247,13 +273,13 @@ class _VerdictCardState extends ConsumerState<VerdictCard>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'Verified by On-Device Kavach Shield',
+                      shieldTitle,
                       style: t.textTheme.titleSmall
                           ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Cloud AI is offline. Your verdict is 100% secured by the local offline rule engine.',
+                      shieldSub,
                       style: t.textTheme.bodySmall?.copyWith(
                         color: AppColors.onSafeContainer,
                       ),
@@ -271,7 +297,6 @@ class _VerdictCardState extends ConsumerState<VerdictCard>
           ),
         ),
       );
-    }
     }
     return const SizedBox.shrink();
   }
