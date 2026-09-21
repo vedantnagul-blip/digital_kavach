@@ -1,0 +1,539 @@
+import re
+
+html_content = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Kavach - Presentation Slides</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #050811;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+        }
+        .controls {
+            position: sticky;
+            top: 15px;
+            z-index: 100;
+            background: rgba(28, 37, 65, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 40px;
+            border: 1px solid #00D4FF;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.2);
+        }
+        .btn {
+            background: #00D4FF;
+            color: #0B132B;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            background: #ffffff;
+            transform: translateY(-2px);
+        }
+        .slide-counter {
+            font-size: 14px;
+            font-weight: 600;
+            color: #A0AEC0;
+        }
+        .slides-container {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        .slide {
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            background: #0B132B;
+            border: 2px solid #2D3748;
+            border-radius: 16px;
+            padding: 40px 50px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+        .slide-header {
+            margin-bottom: 25px;
+        }
+        .slide-category {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #00D4FF;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .slide-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            flex: 1;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            flex: 1;
+        }
+        .card {
+            background: #1C2541;
+            border: 1px solid #2D3748;
+            border-radius: 12px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .cyan { color: #00D4FF; }
+        .orange { color: #FF9A3C; }
+        .green { color: #10B981; }
+        .red { color: #EF4444; }
+
+        .card ul {
+            list-style: none;
+        }
+        .card li {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #E2E8F0;
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 18px;
+        }
+        .card li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #00D4FF;
+            font-weight: bold;
+        }
+        .slide-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #718096;
+            border-top: 1px solid #1C2541;
+            padding-top: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid #2D3748;
+        }
+        th {
+            background: #1C2541;
+            color: #00D4FF;
+            font-weight: 700;
+        }
+        tr:nth-child(even) {
+            background: rgba(28, 37, 65, 0.4);
+        }
+        @media print {
+            .controls { display: none; }
+            body { background: transparent; padding: 0; }
+            .slide { page-break-after: always; box-shadow: none; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <span class="slide-counter">Digital Kavach Slides (9 Slides)</span>
+        <button class="btn" onclick="window.print()">🖨️ Print / Save to PDF</button>
+    </div>
+
+    <div class="slides-container">
+
+        <!-- SLIDE 1 -->
+        <div class="slide" style="justify-content: center; align-items: center; text-align: center;">
+            <div style="font-size: 16px; font-weight: 800; color: #00D4FF; letter-spacing: 2px; margin-bottom: 15px;">FINAL YEAR PROJECT PRESENTATION</div>
+            <h1 style="font-size: 46px; font-weight: 900; color: #00D4FF; margin-bottom: 12px;">DIGITAL KAVACH (डिजिटल कवच)</h1>
+            <h2 style="font-size: 24px; font-weight: 600; color: #ffffff; margin-bottom: 20px;">An Edge-First, AI-Powered Threat Forensics & Anti-Fraud Shield</h2>
+            <p style="font-size: 18px; font-style: italic; color: #FF9A3C; margin-bottom: 30px;">"Defending Every Indian from Digital Fraud — Privately, Instantly, in Their Mother Tongue."</p>
+            <div style="background: #1C2541; border: 1px solid #2D3748; border-radius: 30px; padding: 12px 30px; font-size: 14px; color: #A0AEC0; font-weight: 600;">
+                570+ Verified Offline Rules &nbsp;|&nbsp; Dynamic Few-Shot RAG &nbsp;|&nbsp; 10 Indian Languages &nbsp;|&nbsp; Elder Mode
+            </div>
+            <div class="slide-footer" style="position: absolute; bottom: 25px; left: 50px; right: 50px;">
+                <span>Department of Computer Science & Engineering</span>
+                <span>Slide 1 of 9</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 2 -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-category">Problem Statement & Urgency</div>
+                <div class="slide-title">The Cyber Fraud Crisis in India (2025–2026)</div>
+            </div>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-title orange">🚨 28+ Lakh Cases</div>
+                    <ul>
+                        <li>Over 28 Lakh cybercrimes registered via I4C in 2025 alone.</li>
+                        <li>300% surge in financial fraud over the last 3 years.</li>
+                        <li>Targeting Tier-2, Tier-3 cities & regional language speakers.</li>
+                        <li>Senior citizens & non-English speakers suffer 70%+ of losses.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title cyan">⚔️ Modern Modus Operandi</div>
+                    <ul>
+                        <li><b>Digital Arrest:</b> Fake CBI/Police video interrogation via Skype/WhatsApp.</li>
+                        <li><b>Nighttime Urgency:</b> "Electricity disconnected at 9:30 PM tonight".</li>
+                        <li><b>Malicious APKs:</b> PM-Yojana, fake bank updates hijacking SMS & OTP.</li>
+                        <li><b>Telegram Task Scams:</b> "Like YouTube videos / rate Google Maps".</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title green">⏳ Golden Hour Crisis</div>
+                    <ul>
+                        <li>Victims have only 24–48 hours to freeze siphoned funds via 1930.</li>
+                        <li>Panic & confusion paralyze victims; they don't know who to call.</li>
+                        <li>Evidence (transaction IDs, URLs, numbers) is lost or deleted.</li>
+                        <li>Existing apps only block phone numbers, ignoring chat fraud.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Digital Kavach — Problem Context</span>
+                <span>Slide 2 of 9</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 3 -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-category">System Overview</div>
+                <div class="slide-title">What is Digital Kavach? (Dual Protection Mechanism)</div>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title cyan">🛡️ Kavach Sentinel (Automated 24x7)</div>
+                    <ul>
+                        <li>Background Android Notification Listener Service.</li>
+                        <li>Intercepts WhatsApp, SMS, & Telegram alerts in real time.</li>
+                        <li>Scans threats before the user even taps or opens the scam link.</li>
+                        <li>Zero battery drain: executes in &lt;15ms on-device without waking cloud APIs.</li>
+                        <li>Instant heads-up alarm triggers if suspicious payload is detected.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title orange">🔍 Active Forensic Scanner (On-Demand)</div>
+                    <ul>
+                        <li><b>Share Sheet Integration:</b> User forwards any message/link to Kavach.</li>
+                        <li><b>Devanagari & Latin OCR:</b> Google ML Kit extracts text from screenshots.</li>
+                        <li><b>Client-Side PII Sanitizer:</b> Masks Aadhaar, PAN, and UPI IDs locally.</li>
+                        <li><b>Multi-Lingual Verdict:</b> Explains threats in 10 Indian regional languages.</li>
+                        <li><b>Audio Narration:</b> Reads warnings aloud for elderly and rural users.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Digital Kavach — Core Mechanism</span>
+                <span>Slide 3 of 9</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 4 -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-category">Deep Engineering</div>
+                <div class="slide-title">Dual-Tier Hybrid Edge Architecture</div>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title green">⚡ Tier 1: On-Device Engine (Offline)</div>
+                    <ul>
+                        <li>570+ Verified Regex Threat Rules compiled from I4C & CERT-In.</li>
+                        <li>Heuristic Risk Scoring (0 to 100) across 5 risk dimensions.</li>
+                        <li>Works 100% offline with ZERO internet requirement.</li>
+                        <li>Sub-15ms response latency: zero cloud dependencies.</li>
+                        <li>Handles ~80% of routine scam messages directly on-device.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title cyan">🧠 Tier 2: Dynamic Few-Shot RAG AI</div>
+                    <ul>
+                        <li>Triggered only on borderline/ambiguous messages (score 25–65).</li>
+                        <li><b>ThreatMemoryStore:</b> Local vector cache of confirmed scam playbooks.</li>
+                        <li><b>Dynamic Few-Shot RAG:</b> Injects real Indian scam precedents into prompt.</li>
+                        <li><b>Self-Learning:</b> New confirmed scams are saved locally to Threat Memory.</li>
+                        <li>Strict JSON Schema Output with sanitized user-facing reasoning.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Digital Kavach — Architecture</span>
+                <span>Slide 4 of 9</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 5 -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-category">Hardened Security</div>
+                <div class="slide-title">Security & Privacy Engineering (Zero-Trust Design)</div>
+            </div>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-title cyan">🔒 PII Sanitizer Engine</div>
+                    <ul>
+                        <li><b>Aadhaar Redaction:</b> Scans 12-digit UID patterns and masks with [AADHAAR].</li>
+                        <li><b>PAN Redaction:</b> Detects 10-character alphanumeric PAN format.</li>
+                        <li><b>Financial Redaction:</b> Masks phone numbers and UPI VPA IDs.</li>
+                        <li>Private user identity NEVER leaves the device or reaches AI.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title orange">🛡️ Zero UI Key Exposure</div>
+                    <ul>
+                        <li>Complete removal of all API key input forms from the client UI.</li>
+                        <li>Eliminates reverse-engineering risks from APK decompilation.</li>
+                        <li>API credentials configured via compile-time environment flags.</li>
+                        <li>Prevents unauthorized token harvesting and quota drainage.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title green">⚡ Fault-Tolerant Circuit Breakers</div>
+                    <ul>
+                        <li>Automatic failover: If Gemini is rate-limited, Tier 1 takes over.</li>
+                        <li><b>Deduplication Cache:</b> Hive stores verdict hashes to save 90%+ API calls.</li>
+                        <li>Zero Crash Guarantee: Sanitized error displays prevent raw API leakages.</li>
+                        <li>Works reliably in poor rural network environments.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Digital Kavach — Security Engineering</span>
+                <span>Slide 5 of 9</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 6 -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-category">Features & Modules</div>
+                <div class="slide-title">5 Core Pillars of Digital Kavach</div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px;">
+                <div class="card" style="padding: 16px;">
+                    <div class="card-title cyan" style="font-size: 16px; margin-bottom: 8px;">1. Scam Scanner & Sentinel</div>
+                    <p style="font-size: 13px; color: #CBD5E0;">24x7 Notification interception + Screenshot OCR (Devanagari + Latin). Instant threat verdicts in &lt;15ms.</p>
+                </div>
+                <div class="card" style="padding: 16px;">
+                    <div class="card-title orange" style="font-size: 16px; margin-bottom: 8px;">2. Golden Hour Recovery</div>
+                    <p style="font-size: 13px; color: #CBD5E0;">1-Tap direct dialing to 1930 Cyber Helpline. Auto-drafts legal cyber complaints with cryptographic evidence hash.</p>
+                </div>
+                <div class="card" style="padding: 16px;">
+                    <div class="card-title green" style="font-size: 16px; margin-bottom: 8px;">3. Family Shield</div>
+                    <p style="font-size: 13px; color: #CBD5E0;">Alerts adult children when an elderly parent receives high-risk messages. Prevents fraud before money is sent.</p>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                <div class="card" style="padding: 16px;">
+                    <div class="card-title cyan" style="font-size: 16px; margin-bottom: 8px;">4. Accessibility & Elder Mode</div>
+                    <p style="font-size: 13px; color: #CBD5E0;">1.4x enlarged typography, 64dp touch targets, automatic Text-To-Speech (TTS) reading warnings out loud, high-contrast cards.</p>
+                </div>
+                <div class="card" style="padding: 16px;">
+                    <div class="card-title orange" style="font-size: 16px; margin-bottom: 8px;">5. 10 Regional Indian Languages</div>
+                    <p style="font-size: 13px; color: #CBD5E0;">Native UI & explanations for: Hindi, Marathi, Tamil, Telugu, Bengali, Gujarati, Kannada, Malayalam, Punjabi, and English.</p>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Digital Kavach — Core Pillars</span>
+                <span>Slide 6 of 9</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 7 -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-category">Implementation</div>
+                <div class="slide-title">Technology Stack & Production Readiness</div>
+            </div>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-title cyan">📱 Frontend & Core</div>
+                    <ul>
+                        <li><b>Framework:</b> Flutter SDK (Dart 3.x).</li>
+                        <li><b>Architecture:</b> Riverpod 2.x State Management.</li>
+                        <li><b>Local Storage:</b> Hive NoSQL (Microsecond cached lookup).</li>
+                        <li><b>Native Layer:</b> Android NotificationListenerService.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title orange">👁️ Vision & NLP Engine</div>
+                    <ul>
+                        <li><b>Google ML Kit:</b> Devanagari & Latin OCR models.</li>
+                        <li><b>Tier 1 Engine:</b> 570+ Regular Expressions.</li>
+                        <li><b>PII Redaction:</b> Regex sanitizers for Aadhaar/PAN/UPI.</li>
+                        <li><b>Dynamic RAG:</b> ThreatMemoryStore vector cache.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title green">💰 ₹0 Operational Cost</div>
+                    <ul>
+                        <li>80%+ scans resolved on-device via Tier 1 offline.</li>
+                        <li>Free-Tier Gemini API strictly for ambiguous checks.</li>
+                        <li><b>Result Caching:</b> 1,000 users with same scam = 1 API call.</li>
+                        <li>Production-ready architecture for academic defense.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Digital Kavach — Tech Stack</span>
+                <span>Slide 7 of 9</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 8 -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-category">Market Comparison</div>
+                <div class="slide-title">Comparative Analysis: Why Digital Kavach Wins</div>
+            </div>
+            <div class="card" style="padding: 10px; flex: 1;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Capability</th>
+                            <th>Truecaller</th>
+                            <th>Antivirus Apps</th>
+                            <th style="color: #10B981;">Digital Kavach</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Incoming Call Blocking</td>
+                            <td>✅ Yes</td>
+                            <td>❌ No</td>
+                            <td>➖ N/A (Focuses on Chat)</td>
+                        </tr>
+                        <tr>
+                            <td>WhatsApp / SMS Scrutiny</td>
+                            <td>❌ No</td>
+                            <td>❌ No</td>
+                            <td><b style="color: #10B981;">✅ Yes (Sentinel & Share)</b></td>
+                        </tr>
+                        <tr>
+                            <td>Devanagari Screenshot OCR</td>
+                            <td>❌ No</td>
+                            <td>❌ No</td>
+                            <td><b style="color: #10B981;">✅ Yes (On-Device)</b></td>
+                        </tr>
+                        <tr>
+                            <td>Offline 570+ Rules Engine</td>
+                            <td>❌ No</td>
+                            <td>⚠️ Signatures only</td>
+                            <td><b style="color: #10B981;">✅ Yes (&lt;15ms Latency)</b></td>
+                        </tr>
+                        <tr>
+                            <td>Post-Fraud Recovery (1930)</td>
+                            <td>❌ No</td>
+                            <td>❌ No</td>
+                            <td><b style="color: #10B981;">✅ Yes (Golden Hour Wizard)</b></td>
+                        </tr>
+                        <tr>
+                            <td>10 Regional Languages</td>
+                            <td>⚠️ Partial</td>
+                            <td>❌ English only</td>
+                            <td><b style="color: #10B981;">✅ Yes (Full 10 Languages)</b></td>
+                        </tr>
+                        <tr>
+                            <td>Self-Learning RAG Intelligence</td>
+                            <td>❌ No</td>
+                            <td>❌ No</td>
+                            <td><b style="color: #10B981;">✅ Yes (ThreatMemoryStore)</b></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="slide-footer">
+                <span>Digital Kavach — Comparative Evaluation</span>
+                <span>Slide 8 of 9</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 9 -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-category">Evaluation & Demo</div>
+                <div class="slide-title">Conclusion & Live Demonstration</div>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title cyan">🎯 Summary of Achievements</div>
+                    <ul>
+                        <li><b>Edge-First Defense:</b> 570+ rules detect threats with zero internet.</li>
+                        <li><b>Privacy-Guaranteed:</b> On-device PII masking protects citizen data.</li>
+                        <li><b>Vernacular Reach:</b> 10 Indian languages & Voice TTS for elderly.</li>
+                        <li><b>End-to-End:</b> Interception to 1930 Golden Hour Recovery.</li>
+                        <li><b>Self-Learning:</b> ThreatMemoryStore keeps Kavach ahead of scammers.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title green">🧪 Live Demo Scenarios Ready for Panel</div>
+                    <ul>
+                        <li><b>1. Digital Arrest Scam:</b> Fake CBI video warrant interception.</li>
+                        <li><b>2. Electricity Disconnection:</b> Nighttime urgency + fake APK.</li>
+                        <li><b>3. Work-From-Home Task:</b> YouTube like / Maps review scam.</li>
+                        <li><b>4. Bank KYC Phishing:</b> Fake suspension link (.xyz domain).</li>
+                        <li><b>5. Genuine Bank Debit Alert:</b> Zero false positives test.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Digital Kavach — Project Defense</span>
+                <span>Slide 9 of 9</span>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
+"""
+
+with open("/home/user/digital_kavach/Digital_Kavach_Presentation.html", "w") as f:
+    f.write(html_content)
+
+print("HTML Presentation created successfully at /home/user/digital_kavach/Digital_Kavach_Presentation.html")
