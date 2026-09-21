@@ -47,6 +47,10 @@ class OnboardingStrings {
     required this.sentinelStepPostNotif,
     required this.sentinelLater,
     required this.sentinelLockedNote,
+    required this.sentinelActionGrant,
+    required this.sentinelActionGranted,
+    required this.sentinelActive,
+    required this.sentinelEnable,
   });
 
   final String progressLabel;

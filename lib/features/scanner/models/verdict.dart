@@ -106,7 +106,7 @@ class Verdict {
     final Map<String, dynamic>? prov =
         j['provider'] as Map<String, dynamic>?;
     return Verdict(
-      verdict: VerdictLevelX.fromWire(j['verdict'] as String?),
+      verdict: VerdictLevelX.fromWire((j['verdict'] as String?) ?? 'SAFE'),
       riskScore: (j['riskScore'] as num?)?.toInt() ?? 0,
       patternMatched: j['patternMatched'] as String? ?? 'Unknown',
       confidence: (j['confidence'] as num?)?.toDouble() ?? 0.0,

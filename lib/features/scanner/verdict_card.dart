@@ -222,6 +222,7 @@ class _VerdictCardState extends ConsumerState<VerdictCard>
 
   Widget _stateSpecific(BuildContext ctx, ThemeData t) {
     final VerdictUiState s = widget.state;
+    final AppLocale locale = ref.watch(localeProvider);
     if (s is VerdictAiUpgrading) {
       return Padding(
         padding: const EdgeInsets.only(top: 12),
