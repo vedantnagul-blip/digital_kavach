@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/app_spacing.dart';
-
+import '../../sentinel_strings.dart';
 
 class FeedDetailScreen extends ConsumerWidget {
   const FeedDetailScreen({super.key, required this.entry});
@@ -15,10 +15,11 @@ class FeedDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final SentinelStrings s = ref.watch(sentinelStringsProvider);
     final isRed = entry.level == 'RED';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Activity Detail')),
+      appBar: AppBar(title: Text(s.detailTitle)),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.xl20),
         children: [
@@ -43,7 +44,7 @@ class FeedDetailScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isRed ? 'Khatarnak Scam' : 'Shakaspad Sandesh',
+                        isRed ? s.filterHighRisk : s.filterSuspicious,
                         style: theme.textTheme.titleLarge?.copyWith(
                           color: isRed ? AppColors.danger : AppColors.warning,
                           fontWeight: FontWeight.bold,
