@@ -1,54 +1,56 @@
-import 'dart:io';
-
-import 'package:digital_kavach/features/scanner/models/qr_guard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../core/l10n/l10n.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_radius.dart';
 import '../../core/theme/app_spacing.dart';
-import '../../core/widgets/info_chip.dart';
 import '../../core/widgets/kavach_button.dart';
 import '../../core/widgets/kavach_scaffold.dart';
-import '../../data/ai/ai_router.dart';
-import '../../data/rules/score_aggregator.dart';
 import 'models/qr_payload.dart';
+import 'models/scam_verdict.dart';
+import 'models/verdict.dart';
+import 'qr_guard_card.dart';
+import 'scanner_strings.dart';
 import 'verdict_card.dart';
-import 'verdict_ui_state.dart';
+import 'widgets/scam_bait_dialog.dart';
 
 class ScanResultScreen extends ConsumerWidget {
   const ScanResultScreen({
-    required this.scanResult,
-    this.inputText,
-    this.imagePath,
-    this.qrPayload,
     super.key,
+    required this.verdict,
+    required this.inputPreview,
+    this.qrPayload,
   });
 
-  final HybridScanResult scanResult;
-  final String? inputText;
-  final String? imagePath;
+  final ScanVerdict verdict;
+  final String inputPreview;
   final UpiQrPayload? qrPayload;
 
   void _shareResult() {
-    final String verdictStr = scanResult.finalVerdict.verdict.wire;
-    final String text = '🛡️ Digital Kavach Scan Verdict: $verdictStr (${scanResult.finalVerdict.riskScore}/100)\n\n'
-        'Explanation: ${scanResult.finalVerdict.explanationNative}\n\n'
-        'Stay safe from scams!';
+    final String text =
+        'Digital Kavach Threat Alert:\nVerdict: ${verdict.confidence.name.toUpperCase()}\n'
+        'Reason: ${verdict.title}\n\nStay protected with Digital Kavach.';
     Share.share(text);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData t = Theme.of(context);
-    final VerdictUiState cardState = scanResult.hasAi
-        ? VerdictComplete(scanResult.finalVerdict)
-        : VerdictTier1Only(scanResult.finalVerdict);
+    final AppLocale locale = ref.watch(localeProvider);
+    final ScannerStrings s = ref.watch(scannerStringsProvider);
+
+    final VerdictCardState cardState =
+        VerdictPresentationMapper.fromScanVerdict(verdict, locale);
+
+    final bool isDangerous = verdict.riskTier == RiskTier.critical ||
+        verdict.riskTier == RiskTier.high ||
+        verdict.confidence == ConfidenceLevel.phishing ||
+        verdict.confidence == ConfidenceLevel.malicious;
 
     return KavachScaffold(
-      title: const Text('Scan Verdict'),
-      scrollable: true,
+      title: s.verdictTitle,
       actions: <Widget>[
         IconButton(
           icon: const Icon(Icons.share_rounded),
@@ -63,6 +65,51 @@ class ScanResultScreen extends ConsumerWidget {
             QrGuardCard(payload: qrPayload!),
 
           VerdictCard(state: cardState),
+
+          if (isDangerous) ...[
+            const SizedBox(height: AppSpacing.l16),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.l16),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.08),
+                borderRadius: AppRadius.rM,
+                border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.psychology_rounded, color: AppColors.primary),
+                      const SizedBox(width: AppSpacing.s8),
+                      Text(
+                        'Hackathon Feature: AI ScamBaiter',
+                        style: t.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xs4),
+                  Text(
+                    'Deploy an on-device decoy persona to waste scammer time & trick them into sharing bank/UPI details.',
+                    style: t.textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: AppSpacing.m12),
+                  KavachButton(
+                    label: '🎣 Deploy AI Bait-Trap Bot',
+                    variant: KavachButtonVariant.filled,
+                    onPressed: () => ScamBaitDialog.show(
+                      context,
+                      scamType: verdict.title,
+                      originalText: inputPreview,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
 
           const SizedBox(height: AppSpacing.xxl24),
           _buildInputPreview(t),
@@ -94,23 +141,12 @@ class ScanResultScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              if (imagePath != null) ...<Widget>[
-                ClipRRect(
-                  borderRadius: AppRadius.rM,
-                  child: Image.file(
-                    File(imagePath!),
-                    height: 180,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+              SelectableText(
+                inputPreview,
+                style: t.textTheme.bodyMedium?.copyWith(
+                  fontFamily: 'monospace',
                 ),
-                const SizedBox(height: 12),
-              ],
-              if (inputText != null && inputText!.isNotEmpty)
-                SelectableText(
-                  inputText!,
-                  style: t.textTheme.bodyMedium,
-                ),
+              ),
             ],
           ),
         ),
