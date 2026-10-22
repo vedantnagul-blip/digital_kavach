@@ -12,7 +12,10 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/kavach_button.dart';
 import '../../core/widgets/kavach_scaffold.dart';
 import 'models/qr_payload.dart';
+import 'models/upi_spoof_detector.dart';
 import 'scanner_service.dart';
+import 'scanner_strings.dart';
+import 'widgets/upi_spoof_sheet.dart';
 
 class ScannerScreen extends ConsumerStatefulWidget {
   const ScannerScreen({
@@ -44,11 +47,9 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
 
     if (widget.initialText != null && widget.initialText!.isNotEmpty) {
       _textController.text = widget.initialText!;
-      _tabController.index = 0;
-    } else if (widget.initialImagePath != null &&
-        widget.initialImagePath!.isNotEmpty) {
+    }
+    if (widget.initialImagePath != null) {
       _selectedImagePath = widget.initialImagePath;
-      _tabController.index = 1;
     }
   }
 
@@ -59,28 +60,18 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
     super.dispose();
   }
 
-  Future<void> _pasteClipboard() async {
-    final ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
-    if (data?.text != null && data!.text!.isNotEmpty) {
-      setState(() {
-        _textController.text = data.text!;
-      });
-    }
-  }
+  Future<void> _scanText() async {
+    final String text = _textController.text.trim();
+    if (text.isEmpty) return;
 
-  Future<void> _runTextScan() async {
-    if (_textController.text.trim().isEmpty) return;
     setState(() => _loading = true);
-
     try {
-      final res = await ref
-          .read(scannerServiceProvider)
-          .scanText(_textController.text.trim());
-
+      final res = await ref.read(scannerServiceProvider).scanText(text);
       if (!mounted) return;
+
       context.push(Routes.scanResult, extra: <String, dynamic>{
-        'result': res,
-        'inputText': _textController.text,
+        'result': res.result,
+        'inputText': text,
       });
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -88,27 +79,33 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
   }
 
   Future<void> _pickImage(ImageSource source) async {
-    final XFile? file = await _picker.pickImage(source: source);
-    if (file == null) return;
-
-    setState(() {
-      _selectedImagePath = file.path;
-      _loading = true;
-    });
-
     try {
-      final res = await ref
-          .read(scannerServiceProvider)
-          .scanImage(_selectedImagePath!);
+      final XFile? file = await _picker.pickImage(source: source);
+      if (file == null) return;
 
+      setState(() {
+        _selectedImagePath = file.path;
+        _loading = true;
+      });
+
+      final res =
+          await ref.read(scannerServiceProvider).scanImage(file.path);
       if (!mounted) return;
+
       context.push(Routes.scanResult, extra: <String, dynamic>{
         'result': res.result,
-        'inputText': res.extractedText,
-        'imagePath': _selectedImagePath,
+        'inputText': res.extractedText ?? 'Image input',
       });
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _pasteFromClipboard() async {
+    final ClipboardData? data =
+        await Clipboard.getData(Clipboard.kTextPlain);
+    if (data?.text != null && data!.text!.isNotEmpty) {
+      _textController.text = data.text!;
     }
   }
 
@@ -119,12 +116,26 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
     final String? raw = barcodes.first.rawValue;
     if (raw == null || raw.isEmpty) return;
 
-    // Pause scanner
-    setState(() => _loading = true);
+    final UpiQrPayload payload = UpiQrPayload.parse(raw);
+    final analysis = UpiSpoofDetector.analyze(payload);
 
+    // If critical merchant spoofing is detected, show instant Ghost UPI interceptor
+    if (analysis.isSpoofed && mounted) {
+      UpiSpoofSheet.show(
+        context,
+        payload: payload,
+        onProceedAnyway: () => _processAndNavigateQr(raw),
+      );
+      return;
+    }
+
+    await _processAndNavigateQr(raw);
+  }
+
+  Future<void> _processAndNavigateQr(String raw) async {
+    setState(() => _loading = true);
     try {
       final res = await ref.read(scannerServiceProvider).scanQrCode(raw);
-
       if (!mounted) return;
       context.push(Routes.scanResult, extra: <String, dynamic>{
         'result': res.result,
@@ -138,121 +149,114 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData t = Theme.of(context);
+    final ScannerStrings s = ref.watch(scannerStringsProvider);
 
     return KavachScaffold(
-      title: const Text('Scanner Hub'),
+      title: s.tabText,
       bottomNavigationBar: TabBar(
         controller: _tabController,
-        indicatorColor: t.colorScheme.primary,
-        labelColor: t.colorScheme.primary,
-        unselectedLabelColor: t.colorScheme.onSurfaceVariant,
-        tabs: const <Widget>[
-          Tab(icon: Icon(Icons.edit_note_rounded), text: 'Paste Text'),
-          Tab(icon: Icon(Icons.image_search_rounded), text: 'Screenshot'),
-          Tab(icon: Icon(Icons.qr_code_scanner_rounded), text: 'Live QR'),
+        tabs: <Widget>[
+          Tab(icon: const Icon(Icons.text_fields), text: s.tabText),
+          Tab(icon: const Icon(Icons.image), text: s.tabImage),
+          Tab(icon: const Icon(Icons.qr_code_scanner), text: s.tabQr),
         ],
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: <Widget>[
-          _buildPasteTab(t),
-          _buildImageTab(t),
-          _buildQrTab(t),
-        ],
-      ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : TabBarView(
+              controller: _tabController,
+              children: <Widget>[
+                _buildTextTab(s),
+                _buildImageTab(s),
+                _buildQrTab(s),
+              ],
+            ),
     );
   }
 
-  Widget _buildPasteTab(ThemeData t) {
-    return SingleChildScrollView(
+  Widget _buildTextTab(ScannerStrings s) {
+    return Padding(
       padding: const EdgeInsets.all(AppSpacing.l16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
+          Expanded(
+            child: TextField(
+              controller: _textController,
+              maxLines: null,
+              expands: true,
+              textAlignVertical: TextAlignVertical.top,
+              decoration: InputDecoration(
+                hintText: s.inputHint,
+                border: const OutlineInputBorder(
+                  borderRadius: AppRadius.rM,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.m12),
           Row(
             children: <Widget>[
-              Text('Inspect Text', style: t.textTheme.titleMedium),
-              const Spacer(),
-              TextButton.icon(
-                onPressed: _pasteClipboard,
-                icon: const Icon(Icons.content_paste_rounded, size: 18),
-                label: const Text('Paste Clipboard'),
+              IconButton.outlined(
+                icon: const Icon(Icons.paste_rounded),
+                tooltip: s.pasteClipboard,
+                onPressed: _pasteFromClipboard,
+              ),
+              const SizedBox(width: AppSpacing.s8),
+              Expanded(
+                child: KavachButton(
+                  label: s.scanButton,
+                  variant: KavachButtonVariant.filled,
+                  onPressed: _scanText,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _textController,
-            minLines: 5,
-            maxLines: 10,
-            decoration: const InputDecoration(
-              hintText: 'Paste WhatsApp message, SMS, or link here...',
-            ),
-          ),
-          const SizedBox(height: 16),
-          KavachButton(
-            label: 'Scan Text',
-            icon: Icons.shield_rounded,
-            loading: _loading,
-            expand: true,
-            onPressed: _runTextScan,
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildImageTab(ThemeData t) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.l16),
+  Widget _buildImageTab(ScannerStrings s) {
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.xl20),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Text('Screenshot OCR Scan', style: t.textTheme.titleMedium),
-          const SizedBox(height: 4),
+          Icon(Icons.document_scanner_rounded, size: 80, color: AppColors.primary),
+          const SizedBox(height: AppSpacing.xl20),
           Text(
-            'Upload a payment screenshot, WhatsApp chat image, or fake offer banner.',
-            style: t.textTheme.bodyMedium,
+            'OCR Scam Poster & Screenshot Scanner',
+            style: Theme.of(context).textTheme.headlineSmall,
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 20),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _loading ? null : () => _pickImage(ImageSource.gallery),
-                  icon: const Icon(Icons.photo_library_rounded),
-                  label: const Text('Gallery'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _loading ? null : () => _pickImage(ImageSource.camera),
-                  icon: const Icon(Icons.camera_alt_rounded),
-                  label: const Text('Camera'),
-                ),
-              ),
-            ],
+          const SizedBox(height: AppSpacing.s8),
+          Text(
+            'Upload WhatsApp screenshots, reward posters, or suspicious letters in English & Devanagari.',
+            style: Theme.of(context).textTheme.bodyMedium,
+            textAlign: TextAlign.center,
           ),
-          if (_loading) ...<Widget>[
-            const SizedBox(height: 32),
-            const Center(
-              child: Column(
-                children: <Widget>[
-                  CircularProgressIndicator(),
-                  SizedBox(height: 12),
-                  Text('Reading text via ML Kit OCR...'),
-                ],
-              ),
-            ),
-          ],
+          const SizedBox(height: AppSpacing.xxl24),
+          KavachButton(
+            label: s.pickGallery,
+            icon: Icons.photo_library_rounded,
+            variant: KavachButtonVariant.filled,
+            onPressed: () => _pickImage(ImageSource.gallery),
+          ),
+          const SizedBox(height: AppSpacing.m12),
+          KavachButton(
+            label: s.takePhoto,
+            icon: Icons.camera_alt_rounded,
+            variant: KavachButtonVariant.tonal,
+            onPressed: () => _pickImage(ImageSource.camera),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildQrTab(ThemeData t) {
+  Widget _buildQrTab(ScannerStrings s) {
     return Stack(
       children: <Widget>[
         MobileScanner(
@@ -269,6 +273,30 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
           ),
         ),
         Positioned(
+          top: 24,
+          left: 24,
+          right: 24,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.black87,
+              borderRadius: AppRadius.rM,
+              border: Border.all(color: Colors.cyanAccent.withOpacity(0.4)),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.security, color: Colors.cyanAccent, size: 18),
+                SizedBox(width: 8),
+                Text(
+                  'Ghost UPI Steganography Shield Active',
+                  style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Positioned(
           bottom: 24,
           left: 24,
           right: 24,
@@ -279,19 +307,12 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
               borderRadius: AppRadius.rM,
             ),
             child: const Text(
-              'Align UPI QR code within frame',
+              'Align UPI QR code within frame\nDetects forged merchant handles in real-time',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
         ),
-        if (_loading)
-          Container(
-            color: Colors.black54,
-            child: const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
-          ),
       ],
     );
   }
