@@ -36,6 +36,7 @@ class VerdictCard extends ConsumerStatefulWidget {
 class _VerdictCardState extends ConsumerState<VerdictCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _entry;
+  TtsService? _ttsService;
 
   @override
   void initState() {
@@ -69,7 +70,6 @@ class _VerdictCardState extends ConsumerState<VerdictCard>
     }
   }
 
-  TtsService? _ttsService;
 
   @override
   void didChangeDependencies() {
