@@ -132,15 +132,12 @@ class AiRouter {
           final Verdict gemmaVerdict = Verdict(
             verdict: isCritical ? VerdictLevel.red : (tier1.level == VerdictLevel.amber ? VerdictLevel.amber : VerdictLevel.green),
             riskScore: isCritical ? 88 : tier1.score,
-            confidence: isCritical ? ConfidenceLevel.high : ConfidenceLevel.medium,
-            category: 'Offline Edge AI (Gemma)',
-            action: isCritical ? VerdictAction.blockReport : VerdictAction.safe,
-            title: isCritical ? 'Suspicious Coercion Pattern' : 'Safe Content',
-            explanationEn: gemmaResp,
+            patternMatched: isCritical ? 'Edge AI Coercion Pattern' : 'Safe Content Pattern',
+            confidence: isCritical ? 0.95 : 0.70,
+            redFlags: isCritical ? <String>['Detected by on-device Gemma Edge AI', gemmaResp] : <String>[],
             explanationNative: gemmaResp,
-            provider: const AiProviderInfo(provider: AiProvider.tier1),
-            modelId: 'gemma-2b-int4-offline',
-            cachedAt: DateTime.now(),
+            recommendedActions: isCritical ? <String>['Do not click links or send money', 'Dial 1930 Helpline'] : <String>['No action needed'],
+            provider: const AiProviderInfo(provider: AiProvider.tier1, model: 'gemma-2b-int4-offline'),
           );
 
           return HybridScanResult(
