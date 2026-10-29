@@ -69,10 +69,18 @@ class _VerdictCardState extends ConsumerState<VerdictCard>
     }
   }
 
+  TtsService? _ttsService;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _ttsService = ref.read(ttsServiceProvider);
+  }
+
   @override
   void dispose() {
     _entry.dispose();
-    ref.read(ttsServiceProvider).stop();
+    _ttsService?.stop();
     super.dispose();
   }
 
