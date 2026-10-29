@@ -137,7 +137,7 @@ class AiRouter {
             redFlags: isCritical ? <String>['Detected by on-device Gemma Edge AI', gemmaResp] : <String>[],
             explanationNative: gemmaResp,
             recommendedActions: isCritical ? <String>['Do not click links or send money', 'Dial 1930 Helpline'] : <String>['No action needed'],
-            provider: const AiProviderInfo(provider: AiProvider.tier1, model: 'gemma-2b-int4-offline'),
+            provider: const AiProviderInfo(provider: AiProvider.gemma, model: 'Gemma 2B INT4 (Local)'),
           );
 
           return HybridScanResult(

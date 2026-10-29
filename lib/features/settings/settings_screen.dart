@@ -78,10 +78,16 @@ class SettingsScreen extends ConsumerWidget {
           Text('About Digital Kavach', style: theme.textTheme.titleLarge),
           const SizedBox(height: AppSpacing.s8),
           ListTile(
+            leading: const Icon(Icons.memory_rounded),
+            title: const Text('On-Device Edge AI (Gemma 2B)'),
+            subtitle: const Text('100% Offline Local Model Status & Diagnostics'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/dev/ai'),
+          ),
+          ListTile(
             leading: const Icon(Icons.info_outline),
             title: const Text('App Version'),
             subtitle: const Text('1.0.0 (Production Build)'),
-            onLongPress: () => context.push('/dev/ai'),
           ),
           ListTile(
             leading: const Icon(Icons.source_outlined),
