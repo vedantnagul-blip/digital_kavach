@@ -2,15 +2,34 @@ import 'dart:typed_data';
 
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 import 'complaint_service.dart';
 
-/// Generates a clean A4 PDF of the complaint draft.
+/// Generates a clean A4 PDF of the complaint draft with Unicode / regional script support.
 class RecoveryPdf {
   Future<Uint8List> generate(RecoveryDraft draft) async {
+    pw.Font? baseFont;
+    pw.Font? boldFont;
+
+    try {
+      baseFont = await PdfGoogleFonts.notoSansRegular();
+      boldFont = await PdfGoogleFonts.notoSansBold();
+    } catch (_) {
+      // Offline fallback: use standard built-in PDF fonts
+      baseFont = pw.Font.helvetica();
+      boldFont = pw.Font.helveticaBold();
+    }
+
+    final pw.ThemeData theme = pw.ThemeData.withFont(
+      base: baseFont,
+      bold: boldFont,
+    );
+
     final doc = pw.Document(
       title: draft.emailSubject,
       author: 'Digital Kavach',
+      theme: theme,
     );
 
     doc.addPage(

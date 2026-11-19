@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -120,11 +121,22 @@ class ComplaintService {
       throw const FormatException('No JSON block in AI response');
     }
 
-    // Simple key extraction without dart:convert import issues
     final block = jsonMatch.group(0)!;
-    final complaint = _extractJsonString(block, 'complaintEn');
-    final subject = _extractJsonString(block, 'emailSubject');
-    final body = _extractJsonString(block, 'emailBody');
+    String complaint = '';
+    String subject = '';
+    String body = '';
+
+    try {
+      final decoded = jsonDecode(block) as Map<String, dynamic>;
+      complaint = decoded['complaintEn'] as String? ?? '';
+      subject = decoded['emailSubject'] as String? ?? '';
+      body = decoded['emailBody'] as String? ?? '';
+    } catch (_) {
+      // Fallback regex extraction if raw json has minor unescaped issues
+      complaint = _extractJsonString(block, 'complaintEn');
+      subject = _extractJsonString(block, 'emailSubject');
+      body = _extractJsonString(block, 'emailBody');
+    }
 
     if (complaint.isEmpty) {
       throw const FormatException('Empty complaint in AI response');

@@ -84,6 +84,7 @@ object WarnNotifier {
         val muteIntent = Intent(context, WarnActionReceiver::class.java).apply {
             action = "com.digitalkavach.app.MUTE_24H"
             putExtra("titleHash", titleHash)
+            putExtra("entryId", entryId)
         }
         val mutePending = PendingIntent.getBroadcast(
             context, ("mute_$entryId").hashCode(), muteIntent,

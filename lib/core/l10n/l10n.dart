@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/local/user_prefs.dart';
 import 'strings_base.dart';
 import 'strings_bn.dart';
 import 'strings_en.dart';
@@ -72,8 +73,7 @@ class L10n {
     }
   }
 
-  /// Bilingual convenience: "native / English" — for error surfaces where we
-  /// deliberately show both to reassure non-English readers.
+  /// Bilingual convenience: "native / English"
   String bilingual(String Function(StringsBase) selector) {
     if (locale == AppLocale.en) return selector(strings);
     final String native = selector(strings);
@@ -83,9 +83,18 @@ class L10n {
   }
 }
 
-/// Selected locale.
+/// Selected locale — initialized from saved user preferences.
 final StateProvider<AppLocale> localeProvider =
-StateProvider<AppLocale>((StateProviderRef<AppLocale> ref) => AppLocale.en);
+StateProvider<AppLocale>((StateProviderRef<AppLocale> ref) {
+  try {
+    final UserPrefs prefs = ref.watch(userPrefsProvider);
+    final String? saved = prefs.langCode;
+    if (saved != null && saved.isNotEmpty) {
+      return AppLocale.fromCode(saved);
+    }
+  } catch (_) {}
+  return AppLocale.en;
+});
 
 /// Derived L10n bundle.
 final Provider<L10n> l10nProvider = Provider<L10n>((Ref<L10n> ref) {

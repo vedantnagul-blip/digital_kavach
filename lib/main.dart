@@ -21,47 +21,56 @@ import 'core/utils/app_logger.dart';
 import 'data/firebase/user_repo.dart';
 import 'data/local/hive_boxes.dart';
 import 'features/onboarding/screens/consent_screen.dart';
-import 'features/scanner/share_intake.dart'; // Phase 05 Share Sheet listener
+import 'features/scanner/share_intake.dart';
 
 void main() {
   runZonedGuarded(
         () async {
       WidgetsFlutterBinding.ensureInitialized();
 
-      // 1. Initialize Firebase
+      // 1. Initialize Firebase.
       await Firebase.initializeApp();
 
-      // 2. Global Flutter error boundary → Crashlytics
+      // 2. Set up Flutter error reporting.
       final FlutterExceptionHandler? previousOnError = FlutterError.onError;
+
       FlutterError.onError = (FlutterErrorDetails details) {
         FirebaseCrashlytics.instance.recordFlutterFatalError(details);
         previousOnError?.call(details);
       };
 
-      PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
-        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      PlatformDispatcher.instance.onError = (
+          Object error,
+          StackTrace stack,
+          ) {
+        FirebaseCrashlytics.instance.recordError(
+          error,
+          stack,
+          fatal: true,
+        );
         return true;
       };
 
-      // 3. Initialize Hive
+      // 3. Initialize Hive.
       try {
         await HiveBoxes.openAll();
       } on StorageException catch (e) {
-        AppLogger.w('Hive init failed, running with in-memory fallback: $e');
+        AppLogger.w('Hive init failed: $e');
       }
 
-      // 4. Initialize WorkManager for background tasks
+      // 4. Initialize WorkManager.
       try {
         await Workmanager().initialize(
           aiScanWorkerDispatcher,
           isInDebugMode: kDebugMode,
         );
+
         AppLogger.i('WorkManager initialized');
       } catch (e) {
         AppLogger.w('WorkManager init warning: $e');
       }
 
-      AppLogger.i('Phase 05 bootstrap complete');
+      AppLogger.i('Digital Kavach bootstrap complete');
 
       runApp(
         ProviderScope(
@@ -75,7 +84,11 @@ void main() {
       );
     },
         (Object error, StackTrace stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      FirebaseCrashlytics.instance.recordError(
+        error,
+        stack,
+        fatal: true,
+      );
     },
   );
 }
@@ -102,6 +115,13 @@ class DigitalKavachApp extends ConsumerWidget {
           Locale('en'),
           Locale('hi'),
           Locale('mr'),
+          Locale('ta'),
+          Locale('te'),
+          Locale('bn'),
+          Locale('gu'),
+          Locale('kn'),
+          Locale('ml'),
+          Locale('pa'),
         ],
         localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
           GlobalMaterialLocalizations.delegate,

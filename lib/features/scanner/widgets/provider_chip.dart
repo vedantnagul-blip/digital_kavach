@@ -25,6 +25,11 @@ class ProviderChip extends StatelessWidget {
           label: info.model == null ? 'Grok' : 'Grok · ${info.model}',
           icon: Icons.psychology_alt_rounded,
         );
+      case AiProvider.gemma:
+        return InfoChip(
+          label: info.model == null ? 'Gemma 2B (Local)' : 'Gemma · ${info.model}',
+          icon: Icons.bolt_rounded,
+        );
       case AiProvider.cached:
         return const InfoChip(
           label: 'Cached verdict',

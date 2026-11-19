@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/empty_state_view.dart';
 import '../../../core/widgets/loading_view.dart';
+import '../sentinel_strings.dart';
 import 'feed_controller.dart';
 import 'widgets/feed_detail_screen.dart';
 import 'widgets/feed_filter_bar.dart';
@@ -16,6 +17,7 @@ class FeedScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(feedControllerProvider);
     final controller = ref.read(feedControllerProvider.notifier);
+    final SentinelStrings s = ref.watch(sentinelStringsProvider);
 
     final allCount = state.entries.length;
     final redCount = state.entries.where((e) => e.level == 'RED').length;
@@ -23,12 +25,12 @@ class FeedScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Activity Feed'),
+        title: Text(s.feedTitle),
         actions: [
           if (state.entries.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.delete_sweep_outlined),
-              tooltip: 'Sab Saaf Karein',
+              tooltip: 'Clear All',
               onPressed: () => _confirmClear(context, controller),
             ),
         ],
@@ -43,7 +45,7 @@ class FeedScreen extends ConsumerWidget {
             child: TextField(
               onChanged: controller.setSearchQuery,
               decoration: InputDecoration(
-                hintText: 'Search pattern or alert…',
+                hintText: 'Search…',
                 prefixIcon: const Icon(Icons.search),
                 isDense: true,
                 filled: true,
@@ -66,10 +68,10 @@ class FeedScreen extends ConsumerWidget {
             child: state.isLoading
                 ? const Center(child: LoadingView())
                 : state.filteredEntries.isEmpty
-                ? const EmptyStateView(
+                ? EmptyStateView(
               icon: Icons.check_circle_outline_rounded,
-              title: 'Koi dhoka nahi mila',
-              message: 'Sab surakshit hai! All clear.',
+              title: s.emptyFeedTitle,
+              message: s.emptyFeedSubtitle,
             )
                 : ListView.builder(
               itemCount: state.filteredEntries.length,
@@ -108,8 +110,8 @@ class FeedScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Saari activity hatayein?'),
-        content: const Text('Yeh action undo nahi ho sakta.'),
+        title: const Text('Clear All?'),
+        content: const Text('Are you sure you want to delete all activity logs?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),

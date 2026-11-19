@@ -37,7 +37,7 @@ class LanguageTile extends StatelessWidget {
           borderRadius: AppRadius.rL,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 180),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               borderRadius: AppRadius.rL,
               border: Border.all(color: border, width: selected ? 2 : 1),
@@ -47,12 +47,14 @@ class LanguageTile extends StatelessWidget {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       Text(
                         language.nativeName,
                         style: t.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
+                          fontSize: 15,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -60,7 +62,9 @@ class LanguageTile extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         language.englishName,
-                        style: t.textTheme.bodySmall,
+                        style: t.textTheme.bodySmall?.copyWith(
+                          fontSize: 12,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -72,6 +76,7 @@ class LanguageTile extends StatelessWidget {
                   scale: selected ? 1.0 : 0.0,
                   child: Icon(
                     Icons.check_circle_rounded,
+                    size: 20,
                     color: t.colorScheme.primary,
                   ),
                 ),
