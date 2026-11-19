@@ -1,0 +1,1287 @@
+{
+  "version": "1.0.0",
+  "status": "candidate_only",
+  "description": "Synthetic patterns for reviewing potentially legitimate messages; not proof of safety, not production allowlist rules, and not integrated into scanning.",
+  "rules": [
+    {
+      "id": "benign_candidate_001",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^Lunch\\s+is\\s+planned\\s+for\\s+tomorrow\\.$",
+      "flags": "i",
+      "example": "Lunch is planned for tomorrow."
+    },
+    {
+      "id": "benign_candidate_002",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^Lunch\\s+is\\s+planned\\s+for\\s+Monday\\.$",
+      "flags": "i",
+      "example": "Lunch is planned for Monday."
+    },
+    {
+      "id": "benign_candidate_003",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^Lunch\\s+is\\s+planned\\s+for\\s+Tuesday\\.$",
+      "flags": "i",
+      "example": "Lunch is planned for Tuesday."
+    },
+    {
+      "id": "benign_candidate_004",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^Lunch\\s+is\\s+planned\\s+for\\s+next\\s+week\\.$",
+      "flags": "i",
+      "example": "Lunch is planned for next week."
+    },
+    {
+      "id": "benign_candidate_005",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^Dinner\\s+is\\s+planned\\s+for\\s+tomorrow\\.$",
+      "flags": "i",
+      "example": "Dinner is planned for tomorrow."
+    },
+    {
+      "id": "benign_candidate_006",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^Dinner\\s+is\\s+planned\\s+for\\s+Monday\\.$",
+      "flags": "i",
+      "example": "Dinner is planned for Monday."
+    },
+    {
+      "id": "benign_candidate_007",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^Dinner\\s+is\\s+planned\\s+for\\s+Tuesday\\.$",
+      "flags": "i",
+      "example": "Dinner is planned for Tuesday."
+    },
+    {
+      "id": "benign_candidate_008",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^Dinner\\s+is\\s+planned\\s+for\\s+next\\s+week\\.$",
+      "flags": "i",
+      "example": "Dinner is planned for next week."
+    },
+    {
+      "id": "benign_candidate_009",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^The\\s+meeting\\s+is\\s+planned\\s+for\\s+tomorrow\\.$",
+      "flags": "i",
+      "example": "The meeting is planned for tomorrow."
+    },
+    {
+      "id": "benign_candidate_010",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^The\\s+meeting\\s+is\\s+planned\\s+for\\s+Monday\\.$",
+      "flags": "i",
+      "example": "The meeting is planned for Monday."
+    },
+    {
+      "id": "benign_candidate_011",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^The\\s+meeting\\s+is\\s+planned\\s+for\\s+Tuesday\\.$",
+      "flags": "i",
+      "example": "The meeting is planned for Tuesday."
+    },
+    {
+      "id": "benign_candidate_012",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^The\\s+meeting\\s+is\\s+planned\\s+for\\s+next\\s+week\\.$",
+      "flags": "i",
+      "example": "The meeting is planned for next week."
+    },
+    {
+      "id": "benign_candidate_013",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^Our\\s+appointment\\s+is\\s+planned\\s+for\\s+tomorrow\\.$",
+      "flags": "i",
+      "example": "Our appointment is planned for tomorrow."
+    },
+    {
+      "id": "benign_candidate_014",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^Our\\s+appointment\\s+is\\s+planned\\s+for\\s+Monday\\.$",
+      "flags": "i",
+      "example": "Our appointment is planned for Monday."
+    },
+    {
+      "id": "benign_candidate_015",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^Our\\s+appointment\\s+is\\s+planned\\s+for\\s+Tuesday\\.$",
+      "flags": "i",
+      "example": "Our appointment is planned for Tuesday."
+    },
+    {
+      "id": "benign_candidate_016",
+      "category": "personal_plans",
+      "language": "en",
+      "pattern": "^Our\\s+appointment\\s+is\\s+planned\\s+for\\s+next\\s+week\\.$",
+      "flags": "i",
+      "example": "Our appointment is planned for next week."
+    },
+    {
+      "id": "benign_candidate_017",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+team\\s+meeting\\s+starts\\s+at\\s+10\\s+AM\\.$",
+      "flags": "i",
+      "example": "The team meeting starts at 10 AM."
+    },
+    {
+      "id": "benign_candidate_018",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+team\\s+meeting\\s+starts\\s+at\\s+11\\s+AM\\.$",
+      "flags": "i",
+      "example": "The team meeting starts at 11 AM."
+    },
+    {
+      "id": "benign_candidate_019",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+team\\s+meeting\\s+starts\\s+at\\s+2\\s+PM\\.$",
+      "flags": "i",
+      "example": "The team meeting starts at 2 PM."
+    },
+    {
+      "id": "benign_candidate_020",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+team\\s+meeting\\s+starts\\s+at\\s+3\\s+PM\\.$",
+      "flags": "i",
+      "example": "The team meeting starts at 3 PM."
+    },
+    {
+      "id": "benign_candidate_021",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+project\\s+review\\s+starts\\s+at\\s+10\\s+AM\\.$",
+      "flags": "i",
+      "example": "The project review starts at 10 AM."
+    },
+    {
+      "id": "benign_candidate_022",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+project\\s+review\\s+starts\\s+at\\s+11\\s+AM\\.$",
+      "flags": "i",
+      "example": "The project review starts at 11 AM."
+    },
+    {
+      "id": "benign_candidate_023",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+project\\s+review\\s+starts\\s+at\\s+2\\s+PM\\.$",
+      "flags": "i",
+      "example": "The project review starts at 2 PM."
+    },
+    {
+      "id": "benign_candidate_024",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+project\\s+review\\s+starts\\s+at\\s+3\\s+PM\\.$",
+      "flags": "i",
+      "example": "The project review starts at 3 PM."
+    },
+    {
+      "id": "benign_candidate_025",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+training\\s+session\\s+starts\\s+at\\s+10\\s+AM\\.$",
+      "flags": "i",
+      "example": "The training session starts at 10 AM."
+    },
+    {
+      "id": "benign_candidate_026",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+training\\s+session\\s+starts\\s+at\\s+11\\s+AM\\.$",
+      "flags": "i",
+      "example": "The training session starts at 11 AM."
+    },
+    {
+      "id": "benign_candidate_027",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+training\\s+session\\s+starts\\s+at\\s+2\\s+PM\\.$",
+      "flags": "i",
+      "example": "The training session starts at 2 PM."
+    },
+    {
+      "id": "benign_candidate_028",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+training\\s+session\\s+starts\\s+at\\s+3\\s+PM\\.$",
+      "flags": "i",
+      "example": "The training session starts at 3 PM."
+    },
+    {
+      "id": "benign_candidate_029",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+workshop\\s+starts\\s+at\\s+10\\s+AM\\.$",
+      "flags": "i",
+      "example": "The workshop starts at 10 AM."
+    },
+    {
+      "id": "benign_candidate_030",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+workshop\\s+starts\\s+at\\s+11\\s+AM\\.$",
+      "flags": "i",
+      "example": "The workshop starts at 11 AM."
+    },
+    {
+      "id": "benign_candidate_031",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+workshop\\s+starts\\s+at\\s+2\\s+PM\\.$",
+      "flags": "i",
+      "example": "The workshop starts at 2 PM."
+    },
+    {
+      "id": "benign_candidate_032",
+      "category": "office_schedule",
+      "language": "en",
+      "pattern": "^The\\s+workshop\\s+starts\\s+at\\s+3\\s+PM\\.$",
+      "flags": "i",
+      "example": "The workshop starts at 3 PM."
+    },
+    {
+      "id": "benign_candidate_033",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+class\\s+is\\s+scheduled\\s+for\\s+Monday\\.$",
+      "flags": "i",
+      "example": "Your class is scheduled for Monday."
+    },
+    {
+      "id": "benign_candidate_034",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+class\\s+is\\s+scheduled\\s+for\\s+Tuesday\\.$",
+      "flags": "i",
+      "example": "Your class is scheduled for Tuesday."
+    },
+    {
+      "id": "benign_candidate_035",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+class\\s+is\\s+scheduled\\s+for\\s+Wednesday\\.$",
+      "flags": "i",
+      "example": "Your class is scheduled for Wednesday."
+    },
+    {
+      "id": "benign_candidate_036",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+class\\s+is\\s+scheduled\\s+for\\s+Friday\\.$",
+      "flags": "i",
+      "example": "Your class is scheduled for Friday."
+    },
+    {
+      "id": "benign_candidate_037",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+lecture\\s+is\\s+scheduled\\s+for\\s+Monday\\.$",
+      "flags": "i",
+      "example": "Your lecture is scheduled for Monday."
+    },
+    {
+      "id": "benign_candidate_038",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+lecture\\s+is\\s+scheduled\\s+for\\s+Tuesday\\.$",
+      "flags": "i",
+      "example": "Your lecture is scheduled for Tuesday."
+    },
+    {
+      "id": "benign_candidate_039",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+lecture\\s+is\\s+scheduled\\s+for\\s+Wednesday\\.$",
+      "flags": "i",
+      "example": "Your lecture is scheduled for Wednesday."
+    },
+    {
+      "id": "benign_candidate_040",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+lecture\\s+is\\s+scheduled\\s+for\\s+Friday\\.$",
+      "flags": "i",
+      "example": "Your lecture is scheduled for Friday."
+    },
+    {
+      "id": "benign_candidate_041",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+library\\s+session\\s+is\\s+scheduled\\s+for\\s+Monday\\.$",
+      "flags": "i",
+      "example": "Your library session is scheduled for Monday."
+    },
+    {
+      "id": "benign_candidate_042",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+library\\s+session\\s+is\\s+scheduled\\s+for\\s+Tuesday\\.$",
+      "flags": "i",
+      "example": "Your library session is scheduled for Tuesday."
+    },
+    {
+      "id": "benign_candidate_043",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+library\\s+session\\s+is\\s+scheduled\\s+for\\s+Wednesday\\.$",
+      "flags": "i",
+      "example": "Your library session is scheduled for Wednesday."
+    },
+    {
+      "id": "benign_candidate_044",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+library\\s+session\\s+is\\s+scheduled\\s+for\\s+Friday\\.$",
+      "flags": "i",
+      "example": "Your library session is scheduled for Friday."
+    },
+    {
+      "id": "benign_candidate_045",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+study\\s+group\\s+is\\s+scheduled\\s+for\\s+Monday\\.$",
+      "flags": "i",
+      "example": "Your study group is scheduled for Monday."
+    },
+    {
+      "id": "benign_candidate_046",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+study\\s+group\\s+is\\s+scheduled\\s+for\\s+Tuesday\\.$",
+      "flags": "i",
+      "example": "Your study group is scheduled for Tuesday."
+    },
+    {
+      "id": "benign_candidate_047",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+study\\s+group\\s+is\\s+scheduled\\s+for\\s+Wednesday\\.$",
+      "flags": "i",
+      "example": "Your study group is scheduled for Wednesday."
+    },
+    {
+      "id": "benign_candidate_048",
+      "category": "education",
+      "language": "en",
+      "pattern": "^Your\\s+study\\s+group\\s+is\\s+scheduled\\s+for\\s+Friday\\.$",
+      "flags": "i",
+      "example": "Your study group is scheduled for Friday."
+    },
+    {
+      "id": "benign_candidate_049",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+parcel\\s+has\\s+been\\s+delivered\\.$",
+      "flags": "i",
+      "example": "Your parcel has been delivered."
+    },
+    {
+      "id": "benign_candidate_050",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+parcel\\s+has\\s+been\\s+dispatched\\.$",
+      "flags": "i",
+      "example": "Your parcel has been dispatched."
+    },
+    {
+      "id": "benign_candidate_051",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+parcel\\s+is\\s+ready\\s+for\\s+pickup\\.$",
+      "flags": "i",
+      "example": "Your parcel is ready for pickup."
+    },
+    {
+      "id": "benign_candidate_052",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+parcel\\s+is\\s+being\\s+prepared\\.$",
+      "flags": "i",
+      "example": "Your parcel is being prepared."
+    },
+    {
+      "id": "benign_candidate_053",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+package\\s+has\\s+been\\s+delivered\\.$",
+      "flags": "i",
+      "example": "Your package has been delivered."
+    },
+    {
+      "id": "benign_candidate_054",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+package\\s+has\\s+been\\s+dispatched\\.$",
+      "flags": "i",
+      "example": "Your package has been dispatched."
+    },
+    {
+      "id": "benign_candidate_055",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+package\\s+is\\s+ready\\s+for\\s+pickup\\.$",
+      "flags": "i",
+      "example": "Your package is ready for pickup."
+    },
+    {
+      "id": "benign_candidate_056",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+package\\s+is\\s+being\\s+prepared\\.$",
+      "flags": "i",
+      "example": "Your package is being prepared."
+    },
+    {
+      "id": "benign_candidate_057",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+order\\s+has\\s+been\\s+delivered\\.$",
+      "flags": "i",
+      "example": "Your order has been delivered."
+    },
+    {
+      "id": "benign_candidate_058",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+order\\s+has\\s+been\\s+dispatched\\.$",
+      "flags": "i",
+      "example": "Your order has been dispatched."
+    },
+    {
+      "id": "benign_candidate_059",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+order\\s+is\\s+ready\\s+for\\s+pickup\\.$",
+      "flags": "i",
+      "example": "Your order is ready for pickup."
+    },
+    {
+      "id": "benign_candidate_060",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+order\\s+is\\s+being\\s+prepared\\.$",
+      "flags": "i",
+      "example": "Your order is being prepared."
+    },
+    {
+      "id": "benign_candidate_061",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+grocery\\s+delivery\\s+has\\s+been\\s+delivered\\.$",
+      "flags": "i",
+      "example": "Your grocery delivery has been delivered."
+    },
+    {
+      "id": "benign_candidate_062",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+grocery\\s+delivery\\s+has\\s+been\\s+dispatched\\.$",
+      "flags": "i",
+      "example": "Your grocery delivery has been dispatched."
+    },
+    {
+      "id": "benign_candidate_063",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+grocery\\s+delivery\\s+is\\s+ready\\s+for\\s+pickup\\.$",
+      "flags": "i",
+      "example": "Your grocery delivery is ready for pickup."
+    },
+    {
+      "id": "benign_candidate_064",
+      "category": "delivery_status",
+      "language": "en",
+      "pattern": "^Your\\s+grocery\\s+delivery\\s+is\\s+being\\s+prepared\\.$",
+      "flags": "i",
+      "example": "Your grocery delivery is being prepared."
+    },
+    {
+      "id": "benign_candidate_065",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+account\\s+statement\\s+is\\s+available\\s+in\\s+your\\s+banking\\s+app\\.$",
+      "flags": "i",
+      "example": "Your account statement is available in your banking app."
+    },
+    {
+      "id": "benign_candidate_066",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+account\\s+statement\\s+is\\s+available\\s+at\\s+your\\s+bank\\s+branch\\.$",
+      "flags": "i",
+      "example": "Your account statement is available at your bank branch."
+    },
+    {
+      "id": "benign_candidate_067",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+account\\s+statement\\s+has\\s+been\\s+prepared\\.$",
+      "flags": "i",
+      "example": "Your account statement has been prepared."
+    },
+    {
+      "id": "benign_candidate_068",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+account\\s+statement\\s+is\\s+ready\\s+for\\s+your\\s+review\\.$",
+      "flags": "i",
+      "example": "Your account statement is ready for your review."
+    },
+    {
+      "id": "benign_candidate_069",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+monthly\\s+statement\\s+is\\s+available\\s+in\\s+your\\s+banking\\s+app\\.$",
+      "flags": "i",
+      "example": "Your monthly statement is available in your banking app."
+    },
+    {
+      "id": "benign_candidate_070",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+monthly\\s+statement\\s+is\\s+available\\s+at\\s+your\\s+bank\\s+branch\\.$",
+      "flags": "i",
+      "example": "Your monthly statement is available at your bank branch."
+    },
+    {
+      "id": "benign_candidate_071",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+monthly\\s+statement\\s+has\\s+been\\s+prepared\\.$",
+      "flags": "i",
+      "example": "Your monthly statement has been prepared."
+    },
+    {
+      "id": "benign_candidate_072",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+monthly\\s+statement\\s+is\\s+ready\\s+for\\s+your\\s+review\\.$",
+      "flags": "i",
+      "example": "Your monthly statement is ready for your review."
+    },
+    {
+      "id": "benign_candidate_073",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+transaction\\s+summary\\s+is\\s+available\\s+in\\s+your\\s+banking\\s+app\\.$",
+      "flags": "i",
+      "example": "Your transaction summary is available in your banking app."
+    },
+    {
+      "id": "benign_candidate_074",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+transaction\\s+summary\\s+is\\s+available\\s+at\\s+your\\s+bank\\s+branch\\.$",
+      "flags": "i",
+      "example": "Your transaction summary is available at your bank branch."
+    },
+    {
+      "id": "benign_candidate_075",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+transaction\\s+summary\\s+has\\s+been\\s+prepared\\.$",
+      "flags": "i",
+      "example": "Your transaction summary has been prepared."
+    },
+    {
+      "id": "benign_candidate_076",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+transaction\\s+summary\\s+is\\s+ready\\s+for\\s+your\\s+review\\.$",
+      "flags": "i",
+      "example": "Your transaction summary is ready for your review."
+    },
+    {
+      "id": "benign_candidate_077",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+account\\s+summary\\s+is\\s+available\\s+in\\s+your\\s+banking\\s+app\\.$",
+      "flags": "i",
+      "example": "Your account summary is available in your banking app."
+    },
+    {
+      "id": "benign_candidate_078",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+account\\s+summary\\s+is\\s+available\\s+at\\s+your\\s+bank\\s+branch\\.$",
+      "flags": "i",
+      "example": "Your account summary is available at your bank branch."
+    },
+    {
+      "id": "benign_candidate_079",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+account\\s+summary\\s+has\\s+been\\s+prepared\\.$",
+      "flags": "i",
+      "example": "Your account summary has been prepared."
+    },
+    {
+      "id": "benign_candidate_080",
+      "category": "bank_information",
+      "language": "en",
+      "pattern": "^Your\\s+account\\s+summary\\s+is\\s+ready\\s+for\\s+your\\s+review\\.$",
+      "flags": "i",
+      "example": "Your account summary is ready for your review."
+    },
+    {
+      "id": "benign_candidate_081",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+account\\s+profile\\s+has\\s+been\\s+updated\\.$",
+      "flags": "i",
+      "example": "Your account profile has been updated."
+    },
+    {
+      "id": "benign_candidate_082",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+account\\s+profile\\s+has\\s+been\\s+saved\\.$",
+      "flags": "i",
+      "example": "Your account profile has been saved."
+    },
+    {
+      "id": "benign_candidate_083",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+account\\s+profile\\s+was\\s+updated\\s+successfully\\.$",
+      "flags": "i",
+      "example": "Your account profile was updated successfully."
+    },
+    {
+      "id": "benign_candidate_084",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+account\\s+profile\\s+was\\s+saved\\s+successfully\\.$",
+      "flags": "i",
+      "example": "Your account profile was saved successfully."
+    },
+    {
+      "id": "benign_candidate_085",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+contact\\s+information\\s+has\\s+been\\s+updated\\.$",
+      "flags": "i",
+      "example": "Your contact information has been updated."
+    },
+    {
+      "id": "benign_candidate_086",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+contact\\s+information\\s+has\\s+been\\s+saved\\.$",
+      "flags": "i",
+      "example": "Your contact information has been saved."
+    },
+    {
+      "id": "benign_candidate_087",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+contact\\s+information\\s+was\\s+updated\\s+successfully\\.$",
+      "flags": "i",
+      "example": "Your contact information was updated successfully."
+    },
+    {
+      "id": "benign_candidate_088",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+contact\\s+information\\s+was\\s+saved\\s+successfully\\.$",
+      "flags": "i",
+      "example": "Your contact information was saved successfully."
+    },
+    {
+      "id": "benign_candidate_089",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+communication\\s+preference\\s+has\\s+been\\s+updated\\.$",
+      "flags": "i",
+      "example": "Your communication preference has been updated."
+    },
+    {
+      "id": "benign_candidate_090",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+communication\\s+preference\\s+has\\s+been\\s+saved\\.$",
+      "flags": "i",
+      "example": "Your communication preference has been saved."
+    },
+    {
+      "id": "benign_candidate_091",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+communication\\s+preference\\s+was\\s+updated\\s+successfully\\.$",
+      "flags": "i",
+      "example": "Your communication preference was updated successfully."
+    },
+    {
+      "id": "benign_candidate_092",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+communication\\s+preference\\s+was\\s+saved\\s+successfully\\.$",
+      "flags": "i",
+      "example": "Your communication preference was saved successfully."
+    },
+    {
+      "id": "benign_candidate_093",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+mailing\\s+address\\s+has\\s+been\\s+updated\\.$",
+      "flags": "i",
+      "example": "Your mailing address has been updated."
+    },
+    {
+      "id": "benign_candidate_094",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+mailing\\s+address\\s+has\\s+been\\s+saved\\.$",
+      "flags": "i",
+      "example": "Your mailing address has been saved."
+    },
+    {
+      "id": "benign_candidate_095",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+mailing\\s+address\\s+was\\s+updated\\s+successfully\\.$",
+      "flags": "i",
+      "example": "Your mailing address was updated successfully."
+    },
+    {
+      "id": "benign_candidate_096",
+      "category": "account_status",
+      "language": "en",
+      "pattern": "^Your\\s+mailing\\s+address\\s+was\\s+saved\\s+successfully\\.$",
+      "flags": "i",
+      "example": "Your mailing address was saved successfully."
+    },
+    {
+      "id": "benign_candidate_097",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+KYC\\s+verification\\s+has\\s+been\\s+completed\\.$",
+      "flags": "i",
+      "example": "Your KYC verification has been completed."
+    },
+    {
+      "id": "benign_candidate_098",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+KYC\\s+verification\\s+was\\s+completed\\s+successfully\\.$",
+      "flags": "i",
+      "example": "Your KYC verification was completed successfully."
+    },
+    {
+      "id": "benign_candidate_099",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+KYC\\s+verification\\s+is\\s+complete\\.$",
+      "flags": "i",
+      "example": "Your KYC verification is complete."
+    },
+    {
+      "id": "benign_candidate_100",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+KYC\\s+verification\\s+has\\s+finished\\.$",
+      "flags": "i",
+      "example": "Your KYC verification has finished."
+    },
+    {
+      "id": "benign_candidate_101",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+identity\\s+verification\\s+has\\s+been\\s+completed\\.$",
+      "flags": "i",
+      "example": "Your identity verification has been completed."
+    },
+    {
+      "id": "benign_candidate_102",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+identity\\s+verification\\s+was\\s+completed\\s+successfully\\.$",
+      "flags": "i",
+      "example": "Your identity verification was completed successfully."
+    },
+    {
+      "id": "benign_candidate_103",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+identity\\s+verification\\s+is\\s+complete\\.$",
+      "flags": "i",
+      "example": "Your identity verification is complete."
+    },
+    {
+      "id": "benign_candidate_104",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+identity\\s+verification\\s+has\\s+finished\\.$",
+      "flags": "i",
+      "example": "Your identity verification has finished."
+    },
+    {
+      "id": "benign_candidate_105",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+document\\s+verification\\s+has\\s+been\\s+completed\\.$",
+      "flags": "i",
+      "example": "Your document verification has been completed."
+    },
+    {
+      "id": "benign_candidate_106",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+document\\s+verification\\s+was\\s+completed\\s+successfully\\.$",
+      "flags": "i",
+      "example": "Your document verification was completed successfully."
+    },
+    {
+      "id": "benign_candidate_107",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+document\\s+verification\\s+is\\s+complete\\.$",
+      "flags": "i",
+      "example": "Your document verification is complete."
+    },
+    {
+      "id": "benign_candidate_108",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+document\\s+verification\\s+has\\s+finished\\.$",
+      "flags": "i",
+      "example": "Your document verification has finished."
+    },
+    {
+      "id": "benign_candidate_109",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+profile\\s+verification\\s+has\\s+been\\s+completed\\.$",
+      "flags": "i",
+      "example": "Your profile verification has been completed."
+    },
+    {
+      "id": "benign_candidate_110",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+profile\\s+verification\\s+was\\s+completed\\s+successfully\\.$",
+      "flags": "i",
+      "example": "Your profile verification was completed successfully."
+    },
+    {
+      "id": "benign_candidate_111",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+profile\\s+verification\\s+is\\s+complete\\.$",
+      "flags": "i",
+      "example": "Your profile verification is complete."
+    },
+    {
+      "id": "benign_candidate_112",
+      "category": "kyc_status",
+      "language": "en",
+      "pattern": "^Your\\s+profile\\s+verification\\s+has\\s+finished\\.$",
+      "flags": "i",
+      "example": "Your profile verification has finished."
+    },
+    {
+      "id": "benign_candidate_113",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+OTP\\s+should\\s+never\\s+be\\s+shared\\.$",
+      "flags": "i",
+      "example": "Your OTP should never be shared."
+    },
+    {
+      "id": "benign_candidate_114",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+OTP\\s+should\\s+be\\s+kept\\s+private\\.$",
+      "flags": "i",
+      "example": "Your OTP should be kept private."
+    },
+    {
+      "id": "benign_candidate_115",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+OTP\\s+must\\s+not\\s+be\\s+shared\\.$",
+      "flags": "i",
+      "example": "Your OTP must not be shared."
+    },
+    {
+      "id": "benign_candidate_116",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+OTP\\s+is\\s+confidential\\.$",
+      "flags": "i",
+      "example": "Your OTP is confidential."
+    },
+    {
+      "id": "benign_candidate_117",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+password\\s+should\\s+never\\s+be\\s+shared\\.$",
+      "flags": "i",
+      "example": "Your password should never be shared."
+    },
+    {
+      "id": "benign_candidate_118",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+password\\s+should\\s+be\\s+kept\\s+private\\.$",
+      "flags": "i",
+      "example": "Your password should be kept private."
+    },
+    {
+      "id": "benign_candidate_119",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+password\\s+must\\s+not\\s+be\\s+shared\\.$",
+      "flags": "i",
+      "example": "Your password must not be shared."
+    },
+    {
+      "id": "benign_candidate_120",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+password\\s+is\\s+confidential\\.$",
+      "flags": "i",
+      "example": "Your password is confidential."
+    },
+    {
+      "id": "benign_candidate_121",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+PIN\\s+should\\s+never\\s+be\\s+shared\\.$",
+      "flags": "i",
+      "example": "Your PIN should never be shared."
+    },
+    {
+      "id": "benign_candidate_122",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+PIN\\s+should\\s+be\\s+kept\\s+private\\.$",
+      "flags": "i",
+      "example": "Your PIN should be kept private."
+    },
+    {
+      "id": "benign_candidate_123",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+PIN\\s+must\\s+not\\s+be\\s+shared\\.$",
+      "flags": "i",
+      "example": "Your PIN must not be shared."
+    },
+    {
+      "id": "benign_candidate_124",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+PIN\\s+is\\s+confidential\\.$",
+      "flags": "i",
+      "example": "Your PIN is confidential."
+    },
+    {
+      "id": "benign_candidate_125",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+verification\\s+code\\s+should\\s+never\\s+be\\s+shared\\.$",
+      "flags": "i",
+      "example": "Your verification code should never be shared."
+    },
+    {
+      "id": "benign_candidate_126",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+verification\\s+code\\s+should\\s+be\\s+kept\\s+private\\.$",
+      "flags": "i",
+      "example": "Your verification code should be kept private."
+    },
+    {
+      "id": "benign_candidate_127",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+verification\\s+code\\s+must\\s+not\\s+be\\s+shared\\.$",
+      "flags": "i",
+      "example": "Your verification code must not be shared."
+    },
+    {
+      "id": "benign_candidate_128",
+      "category": "safety_education",
+      "language": "en",
+      "pattern": "^Your\\s+verification\\s+code\\s+is\\s+confidential\\.$",
+      "flags": "i",
+      "example": "Your verification code is confidential."
+    },
+    {
+      "id": "benign_candidate_129",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+receive\\s+money\\s+you\\s+do\\s+not\\s+need\\s+to\\s+enter\\s+your\\s+UPI\\s+PIN\\.$",
+      "flags": "i",
+      "example": "To receive money you do not need to enter your UPI PIN."
+    },
+    {
+      "id": "benign_candidate_130",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+receive\\s+money\\s+never\\s+share\\s+your\\s+UPI\\s+PIN\\.$",
+      "flags": "i",
+      "example": "To receive money never share your UPI PIN."
+    },
+    {
+      "id": "benign_candidate_131",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+receive\\s+money\\s+do\\s+not\\s+disclose\\s+your\\s+UPI\\s+PIN\\.$",
+      "flags": "i",
+      "example": "To receive money do not disclose your UPI PIN."
+    },
+    {
+      "id": "benign_candidate_132",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+receive\\s+money\\s+keep\\s+your\\s+UPI\\s+PIN\\s+private\\.$",
+      "flags": "i",
+      "example": "To receive money keep your UPI PIN private."
+    },
+    {
+      "id": "benign_candidate_133",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+accept\\s+a\\s+payment\\s+you\\s+do\\s+not\\s+need\\s+to\\s+enter\\s+your\\s+UPI\\s+PIN\\.$",
+      "flags": "i",
+      "example": "To accept a payment you do not need to enter your UPI PIN."
+    },
+    {
+      "id": "benign_candidate_134",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+accept\\s+a\\s+payment\\s+never\\s+share\\s+your\\s+UPI\\s+PIN\\.$",
+      "flags": "i",
+      "example": "To accept a payment never share your UPI PIN."
+    },
+    {
+      "id": "benign_candidate_135",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+accept\\s+a\\s+payment\\s+do\\s+not\\s+disclose\\s+your\\s+UPI\\s+PIN\\.$",
+      "flags": "i",
+      "example": "To accept a payment do not disclose your UPI PIN."
+    },
+    {
+      "id": "benign_candidate_136",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+accept\\s+a\\s+payment\\s+keep\\s+your\\s+UPI\\s+PIN\\s+private\\.$",
+      "flags": "i",
+      "example": "To accept a payment keep your UPI PIN private."
+    },
+    {
+      "id": "benign_candidate_137",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+receive\\s+a\\s+transfer\\s+you\\s+do\\s+not\\s+need\\s+to\\s+enter\\s+your\\s+UPI\\s+PIN\\.$",
+      "flags": "i",
+      "example": "To receive a transfer you do not need to enter your UPI PIN."
+    },
+    {
+      "id": "benign_candidate_138",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+receive\\s+a\\s+transfer\\s+never\\s+share\\s+your\\s+UPI\\s+PIN\\.$",
+      "flags": "i",
+      "example": "To receive a transfer never share your UPI PIN."
+    },
+    {
+      "id": "benign_candidate_139",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+receive\\s+a\\s+transfer\\s+do\\s+not\\s+disclose\\s+your\\s+UPI\\s+PIN\\.$",
+      "flags": "i",
+      "example": "To receive a transfer do not disclose your UPI PIN."
+    },
+    {
+      "id": "benign_candidate_140",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+receive\\s+a\\s+transfer\\s+keep\\s+your\\s+UPI\\s+PIN\\s+private\\.$",
+      "flags": "i",
+      "example": "To receive a transfer keep your UPI PIN private."
+    },
+    {
+      "id": "benign_candidate_141",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+receive\\s+a\\s+refund\\s+you\\s+do\\s+not\\s+need\\s+to\\s+enter\\s+your\\s+UPI\\s+PIN\\.$",
+      "flags": "i",
+      "example": "To receive a refund you do not need to enter your UPI PIN."
+    },
+    {
+      "id": "benign_candidate_142",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+receive\\s+a\\s+refund\\s+never\\s+share\\s+your\\s+UPI\\s+PIN\\.$",
+      "flags": "i",
+      "example": "To receive a refund never share your UPI PIN."
+    },
+    {
+      "id": "benign_candidate_143",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+receive\\s+a\\s+refund\\s+do\\s+not\\s+disclose\\s+your\\s+UPI\\s+PIN\\.$",
+      "flags": "i",
+      "example": "To receive a refund do not disclose your UPI PIN."
+    },
+    {
+      "id": "benign_candidate_144",
+      "category": "upi_education",
+      "language": "en",
+      "pattern": "^To\\s+receive\\s+a\\s+refund\\s+keep\\s+your\\s+UPI\\s+PIN\\s+private\\.$",
+      "flags": "i",
+      "example": "To receive a refund keep your UPI PIN private."
+    },
+    {
+      "id": "benign_candidate_145",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+library\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Monday\\.$",
+      "flags": "i",
+      "example": "Your library appointment is confirmed for Monday."
+    },
+    {
+      "id": "benign_candidate_146",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+library\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Tuesday\\.$",
+      "flags": "i",
+      "example": "Your library appointment is confirmed for Tuesday."
+    },
+    {
+      "id": "benign_candidate_147",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+library\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Wednesday\\.$",
+      "flags": "i",
+      "example": "Your library appointment is confirmed for Wednesday."
+    },
+    {
+      "id": "benign_candidate_148",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+library\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Friday\\.$",
+      "flags": "i",
+      "example": "Your library appointment is confirmed for Friday."
+    },
+    {
+      "id": "benign_candidate_149",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+hospital\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Monday\\.$",
+      "flags": "i",
+      "example": "Your hospital appointment is confirmed for Monday."
+    },
+    {
+      "id": "benign_candidate_150",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+hospital\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Tuesday\\.$",
+      "flags": "i",
+      "example": "Your hospital appointment is confirmed for Tuesday."
+    },
+    {
+      "id": "benign_candidate_151",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+hospital\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Wednesday\\.$",
+      "flags": "i",
+      "example": "Your hospital appointment is confirmed for Wednesday."
+    },
+    {
+      "id": "benign_candidate_152",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+hospital\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Friday\\.$",
+      "flags": "i",
+      "example": "Your hospital appointment is confirmed for Friday."
+    },
+    {
+      "id": "benign_candidate_153",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+vaccination\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Monday\\.$",
+      "flags": "i",
+      "example": "Your vaccination appointment is confirmed for Monday."
+    },
+    {
+      "id": "benign_candidate_154",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+vaccination\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Tuesday\\.$",
+      "flags": "i",
+      "example": "Your vaccination appointment is confirmed for Tuesday."
+    },
+    {
+      "id": "benign_candidate_155",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+vaccination\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Wednesday\\.$",
+      "flags": "i",
+      "example": "Your vaccination appointment is confirmed for Wednesday."
+    },
+    {
+      "id": "benign_candidate_156",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+vaccination\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Friday\\.$",
+      "flags": "i",
+      "example": "Your vaccination appointment is confirmed for Friday."
+    },
+    {
+      "id": "benign_candidate_157",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+office\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Monday\\.$",
+      "flags": "i",
+      "example": "Your office appointment is confirmed for Monday."
+    },
+    {
+      "id": "benign_candidate_158",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+office\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Tuesday\\.$",
+      "flags": "i",
+      "example": "Your office appointment is confirmed for Tuesday."
+    },
+    {
+      "id": "benign_candidate_159",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+office\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Wednesday\\.$",
+      "flags": "i",
+      "example": "Your office appointment is confirmed for Wednesday."
+    },
+    {
+      "id": "benign_candidate_160",
+      "category": "public_services",
+      "language": "en",
+      "pattern": "^Your\\s+office\\s+appointment\\s+is\\s+confirmed\\s+for\\s+Friday\\.$",
+      "flags": "i",
+      "example": "Your office appointment is confirmed for Friday."
+    }
+  ]
+}

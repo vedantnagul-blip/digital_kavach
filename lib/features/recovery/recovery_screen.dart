@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/kavach_button.dart';
 import 'copilot_controller.dart';
+import 'recovery_strings.dart';
 import 'screens/bank_screen.dart';
 import 'screens/calm_screen.dart';
 import 'screens/call_1930_screen.dart';
@@ -23,7 +24,7 @@ class RecoveryScreen extends ConsumerStatefulWidget {
 class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
   bool _isRegenerating = false;
 
-  Future<bool> _confirmExit() async {
+  Future<bool> _confirmExit(RecoveryStrings s) async {
     final theme = Theme.of(context);
     final result = await showModalBottomSheet<bool>(
       context: context,
@@ -33,22 +34,22 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Wizard chhod dein?', style: theme.textTheme.headlineLarge),
+            Text(s.wizardTitle, style: theme.textTheme.headlineLarge),
             const SizedBox(height: AppSpacing.m12),
             Text(
-              'Aapki progress save hai — jab wapas aayenge yahin se shuru hoga.',
+              s.calmSubtitle,
               style: theme.textTheme.bodyLarge,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.l16),
             KavachButton(
-              label: 'Haan, chhod dein',
+              label: s.backStep,
               variant: KavachButtonVariant.outlined,
               onPressed: () => Navigator.pop(ctx, true),
             ),
             const SizedBox(height: AppSpacing.s8),
             KavachButton(
-              label: 'Nahi, jaari rakhein',
+              label: s.nextStep,
               variant: KavachButtonVariant.filled,
               onPressed: () => Navigator.pop(ctx, false),
             ),
@@ -64,32 +65,33 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
     final theme = Theme.of(context);
     final session = ref.watch(copilotControllerProvider);
     final controller = ref.read(copilotControllerProvider.notifier);
+    final RecoveryStrings s = ref.watch(recoveryStringsProvider);
 
     if (session == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Recovery Copilot')),
+        appBar: AppBar(title: Text(s.wizardTitle)),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.xl20),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.shield, size: 64),
+                const Icon(Icons.shield_rounded, size: 64),
                 const SizedBox(height: AppSpacing.l16),
                 Text(
-                  'Golden Hour Recovery Copilot',
+                  s.wizardTitle,
                   style: theme.textTheme.headlineLarge,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.m12),
                 Text(
-                  'Agar aap fraud ke shikaar hue hain, hum aapki madad karenge — 7 aasan kadam.',
+                  s.calmSubtitle,
                   style: theme.textTheme.bodyLarge,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.xl20),
                 KavachButton(
-                  label: 'Shuru karein',
+                  label: s.nextStep,
                   variant: KavachButtonVariant.filled,
                   onPressed: () => controller.startNew(),
                 ),
@@ -108,12 +110,12 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
           if (mounted) Navigator.of(context).pop();
           return;
         }
-        final exit = await _confirmExit();
+        final exit = await _confirmExit(s);
         if (exit && mounted) Navigator.of(context).pop();
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Step ${session.step.position}/${RecoveryStep.totalSteps}'),
+          title: Text('${s.wizardTitle} (${session.step.position}/${RecoveryStep.totalSteps})'),
           leading: session.step.canGoBack
               ? IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -122,7 +124,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
               : IconButton(
             icon: const Icon(Icons.close),
             onPressed: () async {
-              final exit = await _confirmExit();
+              final exit = await _confirmExit(s);
               if (exit && mounted) Navigator.of(context).pop();
             },
           ),
@@ -130,38 +132,33 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
         body: Column(
           children: [
             StepChecklist(currentStep: session.step),
-            Expanded(child: _buildStep(session, controller)),
+            Expanded(child: _buildStep(session, controller, s)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStep(RecoverySession session, CopilotController controller) {
+  Widget _buildStep(RecoverySession session, CopilotController controller, RecoveryStrings s) {
     switch (session.step) {
       case RecoveryStep.calm:
         return CalmScreen(
           deadline: session.deadline,
-          countdownExplainer: 'Bank ko 24 ghante me jawab dena zaruri hai',
-          calmTitle: 'Pehle gehri saans lijiye',
-          calmBody:
-          'Hum saath hain. Agle 24 ghante bahut zaruri hain — hum aapko step-by-step madad karenge.',
+          countdownExplainer: s.calmSubtitle,
+          calmTitle: s.calmTitle,
+          calmBody: s.calmSubtitle,
           onNext: () => controller.nextStep(),
         );
 
       case RecoveryStep.call1930:
         return Call1930Screen(
-          scriptTitle: '1930 par kya bolein?',
-          scriptBullets: const [
-            'Apna naam aur sheher batayein',
-            'Kitne paise gaye — exact amount',
-            'Kis app se paise gaye',
-            'Fraudster ka number/UPI ID',
-            'Kab hua tha — date aur time',
-            'Complaint reference number likh lein',
+          scriptTitle: s.call1930Title,
+          scriptBullets: [
+            s.call1930Subtitle,
+            s.callButton,
           ],
-          callLabel: 'Sabse pehle 1930 call karein',
-          markDoneLabel: 'Call ho gayi — aage badhein',
+          callLabel: s.callButton,
+          markDoneLabel: s.nextStep,
           onNext: () => controller.nextStep(),
           onBack: () => controller.previousStep(),
         );
@@ -173,18 +170,18 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
           onNext: () => controller.nextStep(),
           onBack: () => controller.previousStep(),
           questionLabels: const [
-            'Kab hua tha?',
-            'Kitne paise aur kis app se?',
-            'Kisko paise bheje?',
-            'Kya hua tha?',
+            'Date & Time / तारीख और समय',
+            'Amount & App / राशि और ऐप',
+            'To Whom / प्राप्तकर्ता',
+            'Description / विवरण',
             'UTR / Transaction ID',
           ],
           questionHints: const [
-            'Fraud kis din aur kis time hua',
-            'Amount aur payment app select karein',
-            'Payment app ki history se copy karein',
-            'Scam ka type select karein',
-            'Payment app me transaction ki UTR ID',
+            'Select incident date and time',
+            'Enter loss amount and payment method',
+            'Recipient UPI ID, account number or phone',
+            'Describe how the fraud took place',
+            '12-digit bank UTR reference number',
           ],
         );
 

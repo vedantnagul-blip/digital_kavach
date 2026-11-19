@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 import '../../core/utils/app_logger.dart';
 
-/// Prevents cascading failures. 3 fails → open for 10 mins.
+/// Prevents cascading failures. 3 fails → open for 1 min.
 class CircuitBreaker {
   CircuitBreaker(this._box, {this.provider = 'gemini'});
 
@@ -10,7 +10,7 @@ class CircuitBreaker {
   final String provider;
 
   static const int _maxFailures = 3;
-  static const Duration _openDuration = Duration(minutes: 10);
+  static const Duration _openDuration = Duration(minutes: 1);
 
   String get _failKey => 'circuit_${provider}_fails';
   String get _tsKey => 'circuit_${provider}_open_ts';

@@ -32,7 +32,8 @@ object SentinelPrefs {
         "com.whatsapp",
         "com.whatsapp.w4b",
         "com.google.android.apps.messaging",
-        "org.telegram.messenger"
+        "org.telegram.messenger",
+        "com.instagram.android"
     )
 
     private fun prefs(context: Context): SharedPreferences =

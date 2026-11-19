@@ -44,7 +44,8 @@ dependencies:
   workmanager: ^0.5.2
   flutter_local_notifications: ^17.1.2
   timezone: ^0.9.4
-
+  # 🔥 On-Device Gemma Edge AI Plugin
+  flutter_gemma: 0.2.0
   # UX / Utils
   flutter_tts: ^4.0.2
   url_launcher: ^6.3.0
@@ -54,6 +55,7 @@ dependencies:
   intl: ^0.19.0
   device_info_plus: ^10.1.0
   package_info_plus: ^8.0.0
+  cloud_functions: ^5.0.0
 
 dev_dependencies:
   flutter_test:

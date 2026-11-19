@@ -10,11 +10,21 @@ import '../../data/firebase/user_repo.dart';
 import '../../data/local/hive_boxes.dart';
 
 class AiConfig {
-  const AiConfig({this.geminiKey, this.grokKey, this.geminiModel, this.grokModel});
+  const AiConfig({
+    this.geminiKey,
+    this.grokKey,
+    this.chatgptKey,
+    this.geminiModel,
+    this.grokModel,
+    this.chatgptModel,
+  });
+
   final String? geminiKey;
   final String? grokKey;
+  final String? chatgptKey;
   final String? geminiModel;
   final String? grokModel;
+  final String? chatgptModel;
 }
 
 final Provider<AiKeysStore> aiKeysStoreProvider = Provider<AiKeysStore>((Ref ref) {
@@ -36,29 +46,47 @@ class AiKeysStore {
     // 1. Hive override (Dev Panel)
     final String? localGemini = _prefs.get('dev_key_gemini') as String?;
     final String? localGrok = _prefs.get('dev_key_grok') as String?;
+    final String? localChatGpt = _prefs.get('dev_key_chatgpt') as String?;
     String? localGModel = _prefs.get('dev_mod_gemini') as String?;
     final String? localGrModel = _prefs.get('dev_mod_grok') as String?;
+    final String? localChatGptModel = _prefs.get('dev_mod_chatgpt') as String?;
 
-    if (localGModel == 'gemini-2.5-flash-lite' || localGModel == null || localGModel.isEmpty) {
+    if (localGModel == null ||
+        localGModel.isEmpty ||
+        localGModel == 'gemini-3.6-flash' ||
+        localGModel == 'gemini-1.5-pro' ||
+        localGModel == 'gemini-2.5-flash-lite') {
       localGModel = 'gemini-1.5-flash';
     }
 
-    if (localGemini != null && localGemini.trim().isNotEmpty) {
+    final bool hasLocalGemini = localGemini != null && localGemini.trim().isNotEmpty;
+    final bool hasLocalGrok = localGrok != null && localGrok.trim().isNotEmpty;
+    final bool hasLocalChatGpt = localChatGpt != null && localChatGpt.trim().isNotEmpty;
+
+    if (hasLocalGemini || hasLocalGrok || hasLocalChatGpt) {
       return AiConfig(
-        geminiKey: localGemini.trim(),
-        grokKey: (localGrok != null && localGrok.trim().isNotEmpty) ? localGrok.trim() : null,
+        geminiKey: hasLocalGemini ? localGemini!.trim() : (ApiKeys.gemini.trim().isNotEmpty ? ApiKeys.gemini.trim() : null),
+        grokKey: hasLocalGrok ? localGrok!.trim() : (ApiKeys.grok.trim().isNotEmpty ? ApiKeys.grok.trim() : null),
+        chatgptKey: hasLocalChatGpt ? localChatGpt!.trim() : (ApiKeys.chatgpt.trim().isNotEmpty ? ApiKeys.chatgpt.trim() : null),
         geminiModel: localGModel,
-        grokModel: localGrModel ?? 'grok-beta',
+        grokModel: (localGrModel != null && localGrModel.isNotEmpty && localGrModel != 'grok-beta') ? localGrModel : 'llama-3.3-70b-versatile',
+        chatgptModel: (localChatGptModel != null && localChatGptModel.isNotEmpty) ? localChatGptModel : 'gpt-4o-mini',
       );
     }
 
     // 2. ApiKeys constants file (lib/core/utils/api_keys.dart)
-    if (ApiKeys.gemini.trim().isNotEmpty) {
+    final String groqOrGrok = ApiKeys.groq.trim().isNotEmpty
+        ? ApiKeys.groq.trim()
+        : ApiKeys.grok.trim();
+
+    if (ApiKeys.gemini.trim().isNotEmpty || groqOrGrok.isNotEmpty || ApiKeys.chatgpt.trim().isNotEmpty) {
       return AiConfig(
-        geminiKey: ApiKeys.gemini.trim(),
-        grokKey: ApiKeys.grok.trim().isNotEmpty ? ApiKeys.grok.trim() : null,
+        geminiKey: ApiKeys.gemini.trim().isNotEmpty ? ApiKeys.gemini.trim() : null,
+        grokKey: groqOrGrok.isNotEmpty ? groqOrGrok : null,
+        chatgptKey: ApiKeys.chatgpt.trim().isNotEmpty ? ApiKeys.chatgpt.trim() : null,
         geminiModel: ApiKeys.geminiModel.isNotEmpty ? ApiKeys.geminiModel : 'gemini-1.5-flash',
-        grokModel: ApiKeys.grokModel.isNotEmpty ? ApiKeys.grokModel : 'grok-beta',
+        grokModel: ApiKeys.grokModel.isNotEmpty ? ApiKeys.grokModel : 'llama-3.3-70b-versatile',
+        chatgptModel: ApiKeys.chatgptModel.isNotEmpty ? ApiKeys.chatgptModel : 'gpt-4o-mini',
       );
     }
 
@@ -71,8 +99,10 @@ class AiKeysStore {
       return AiConfig(
         geminiKey: data['gemini'] as String?,
         grokKey: data['grok'] as String?,
+        chatgptKey: data['chatgpt'] as String? ?? data['openai'] as String?,
         geminiModel: data['gemini_model'] as String? ?? 'gemini-1.5-flash',
-        grokModel: data['grok_model'] as String? ?? 'grok-beta',
+        grokModel: data['grok_model'] as String? ?? 'llama-3.3-70b-versatile',
+        chatgptModel: data['chatgpt_model'] as String? ?? 'gpt-4o-mini',
       );
     });
   }
@@ -80,8 +110,10 @@ class AiKeysStore {
   Future<void> saveLocalOverrides(AiConfig config) async {
     await _prefs.put('dev_key_gemini', config.geminiKey);
     await _prefs.put('dev_key_grok', config.grokKey);
+    await _prefs.put('dev_key_chatgpt', config.chatgptKey);
     await _prefs.put('dev_mod_gemini', config.geminiModel);
     await _prefs.put('dev_mod_grok', config.grokModel);
+    await _prefs.put('dev_mod_chatgpt', config.chatgptModel);
     AppLogger.i('AiKeysStore: local overrides saved');
   }
 }
